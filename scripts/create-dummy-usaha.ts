@@ -1,12 +1,28 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🔄 Memulai Seeding Data Usaha dengan Tahun Berdiri...')
+  console.log('🔄 Memulai proses seeding (Admin & Usaha)...')
 
+  // 1. CLEANUP: Hapus data lama agar tidak terjadi error duplicate saat redeploy
+  // Pastikan nama model 'usaha' dan 'admin' sesuai dengan di schema.prisma kamu
   await prisma.usaha.deleteMany()
+  await prisma.admin.deleteMany()
 
+  // 2. SEED ADMIN (Menggunakan EMAIL sesuai skema database kamu)
+  const hashedPassword = await bcrypt.hash('admin123', 10)
+  await prisma.admin.create({
+    data: {
+      id: 'cmkkkr6qi0000uadkix7dgf0k', // Manual ID atau biarkan auto-generate
+      email: 'admin@lobar.go.id',
+      password: hashedPassword,
+    }
+  })
+  console.log('✅ Admin berhasil dibuat (Email: admin@lobar.go.id, Pass: admin123)')
+
+  // 3. DATA USAHA (Source gambar menggunakan Picsum agar stabil)
   const dataUsaha = [
     {
       nama: 'Resort Pantai Senggigi Luxury',
@@ -19,8 +35,8 @@ async function main() {
       nomerTelp: '081912345678',
       email: 'info@senggigiresort.com',
       investasi: BigInt(15000000000),
-      tahunBerdiri: 2015, // <--- Tambahin ini
-      gambar: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9',
+      tahunBerdiri: 2015,
+      gambar: 'https://picsum.photos/seed/senggigi/800/600',
       deskripsi: 'Resort mewah di bibir pantai Senggigi dengan pemandangan sunset terbaik di Lombok Barat.',
     },
     {
@@ -34,8 +50,8 @@ async function main() {
       nomerTelp: '087812345678',
       email: 'narmada.agro@example.com',
       investasi: BigInt(2500000000),
-      tahunBerdiri: 2010, // <--- Tambahin ini
-      gambar: 'https://images.unsplash.com/photo-1592419044706-39796d40f98c',
+      tahunBerdiri: 2010,
+      gambar: 'https://picsum.photos/seed/narmada/800/600',
       deskripsi: 'Sentra produksi manggis kualitas ekspor dengan sistem pengairan modern dari mata air Narmada.',
     },
     {
@@ -50,7 +66,7 @@ async function main() {
       email: 'lobster.sekotong@example.com',
       investasi: BigInt(4200000000),
       tahunBerdiri: 2020,
-      gambar: 'https://images.unsplash.com/photo-1559740703-085776d6560b',
+      gambar: 'https://picsum.photos/seed/sekotong/800/600',
       deskripsi: 'Area budidaya lobster air laut yang sangat potensial karena perairan yang masih murni dan tenang.',
     },
     {
@@ -65,7 +81,7 @@ async function main() {
       email: 'banyumulek.clay@example.com',
       investasi: BigInt(1200000000),
       tahunBerdiri: 1995,
-      gambar: 'https://images.unsplash.com/photo-1520406853179-e331df49857b',
+      gambar: 'https://picsum.photos/seed/banyumulek/800/600',
       deskripsi: 'Sentra kerajinan gerabah legendaris yang sudah menembus pasar internasional.',
     },
     {
@@ -80,11 +96,12 @@ async function main() {
       email: 'lembar.logistik@example.com',
       investasi: BigInt(8000000000),
       tahunBerdiri: 2018,
-      gambar: 'https://images.unsplash.com/photo-1586528116311-ad8de3c8a50b',
+      gambar: 'https://picsum.photos/seed/lembar/800/600',
       deskripsi: 'Gudang penyimpanan strategis dekat pintu masuk utama logistik pulau Lombok.',
     },
   ]
 
+  // Loop untuk membuat 15 data random tambahan
   const sektors = ['Pariwisata', 'Pertanian', 'Perikanan', 'Perdagangan', 'Industri', 'Jasa']
   const kecamatans = ['Gerung', 'Kediri', 'Narmada', 'Lingsar', 'Gunungsari', 'Batu Layar', 'Kuripan', 'Labuapi', 'Lembar', 'Sekotong']
 
@@ -103,19 +120,20 @@ async function main() {
       nomerTelp: `081${Math.floor(Math.random() * 900000000 + 100000000)}`,
       email: `usaha${i}@lobar.go.id`,
       investasi: BigInt(Math.floor(Math.random() * 5000 + 500) * 1000000),
-      tahunBerdiri: 2000 + Math.floor(Math.random() * 25), // Random tahun 2000-2025
-      gambar: 'https://images.unsplash.com/photo-1521791136064-7986c2923216',
+      tahunBerdiri: 2000 + Math.floor(Math.random() * 25),
+      gambar: `https://picsum.photos/seed/projek${i}/800/600`,
       deskripsi: `Potensi investasi di sektor ${randomSektor} di wilayah ${randomKecamatan}.`,
     })
   }
 
+  // Masukkan data ke database
   for (const usaha of dataUsaha) {
     await prisma.usaha.create({
       data: usaha
     })
   }
 
-  console.log('✅ Berhasil memasukkan 20 data usaha lengkap dengan tahun berdiri!')
+  console.log('✅ Berhasil memasukkan 20 data usaha & Akun Admin!')
 }
 
 main()
