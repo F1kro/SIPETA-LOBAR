@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("dibuat_pada")
+
+  @@map("admin")
+}
+
+model Usaha {
+  id         String   @id @default(cuid())
+  nama       String   @db.VarChar(255)
+  sektor     String   @db.VarChar(100)
+  status     String   @db.VarChar(50)
+  latitude   Float
+  longitude  Float
+  kecamatan  String   @db.VarChar(100)
+  desa       String   @db.VarChar(100)
+  nomerTelp  String   @db.VarChar(20) @map("nomer_telp")
+  email      String   @db.VarChar(255)
+  deskripsi  String?  @db.Text
+  gambar     String?  @db.VarChar(500)
+  investasi  BigInt?  @map("investasi")
+  tahunBerdiri Int?   @map("tahun_berdiri")
+  createdAt  DateTime @default(now()) @map("dibuat_pada")
+  updatedAt  DateTime @updatedAt @map("diupdate_pada")
+
+  @@map("usaha")
+}
+
+model Wilayah {
+  id            String   @id @default(cuid())
+  kecamatan     String   @db.VarChar(100)
+  desa          String   @db.VarChar(100)
+  latitude      Float
+  longitude     Float
+  statusRdtr    String   @db.VarChar(20) @map("status_rdtr")
+  usahaSesuai   String   @db.LongText @map("usaha_sesuai")
+  perluKajian   String   @db.LongText @map("perlu_kajian")
+  catatanRisiko String?  @db.LongText @map("catatan_risiko")
+  estimasiBiaya String?  @db.VarChar(500) @map("estimasi_biaya")
+  estimasiWaktu String?  @db.VarChar(500) @map("estimasi_waktu")
+  gambarRdtr    String?  @db.VarChar(500) @map("gambar_rdtr")
+  createdAt     DateTime @default(now()) @map("dibuat_pada")
+  updatedAt     DateTime @updatedAt @map("diupdate_pada")
+
+  @@unique([kecamatan, desa])
+  @@map("wilayah")
+}
