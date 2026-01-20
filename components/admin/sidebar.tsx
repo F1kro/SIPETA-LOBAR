@@ -36,7 +36,7 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/20">
               <LayoutDashboard className="w-5 h-5 text-white" />
             </div>
-            <span className="font-black tracking-tighter text-xl italic text-blue-500">SIPETA-LOBAR</span>
+            <span className="font-black tracking-tighter text-xl  text-blue-500">SIPETA-LOBAR</span>
           </div>
           {/* Close Button (Mobile) */}
           <button onClick={onClose} className="md:hidden p-1.5 hover:bg-slate-800 rounded-md transition-colors">

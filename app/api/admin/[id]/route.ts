@@ -2,30 +2,40 @@ import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest, 
+  { params }: { params: Promise<{ id: string }> } // Gunakan Promise di sini
+) {
   try {
+    const { id } = await params // Await params-nya
+    
     const admin = await prisma.admin.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: {
         id: true,
         email: true,
         createdAt: true,
       },
     })
+    
     if (!admin) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
     }
+    
     return NextResponse.json(admin)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch admin' }, { status: 500 })
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params
     const body = await req.json()
 
-    // If password is being updated, hash it
     let data: any = {
       email: body.email,
     }
@@ -35,7 +45,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const admin = await prisma.admin.update({
-      where: { id: params.id },
+      where: { id: id },
       data,
       select: {
         id: true,
@@ -51,10 +61,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params
+    
     await prisma.admin.delete({
-      where: { id: params.id },
+      where: { id: id },
     })
     return NextResponse.json({ success: true })
   } catch (error) {

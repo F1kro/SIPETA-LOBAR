@@ -1,49 +1,42 @@
-import { prisma } from '@/lib/prisma'
-import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const wilayah = await prisma.wilayah.findUnique({
-      where: { id: params.id },
-    })
-    if (!wilayah) {
-      return NextResponse.json({ error: 'Wilayah not found' }, { status: 404 })
-    }
-    return NextResponse.json(wilayah)
+      where: { id }
+    });
+    
+    if (!wilayah) return Response.json({ error: "Not Found" }, { status: 404 });
+    return Response.json(wilayah);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch wilayah' }, { status: 500 })
+    return Response.json({ error: "Error" }, { status: 500 });
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const body = await req.json()
-    const wilayah = await prisma.wilayah.update({
-      where: { id: params.id },
+    const { id } = await params;
+    const body = await req.json();
+    
+    const updated = await prisma.wilayah.update({
+      where: { id },
       data: {
-        kecamatan: body.kecamatan,
-        desa: body.desa,
-        statusRdtr: body.statusRdtr,
-        usahaSesuai: body.usahaSesuai,
-        perluKajian: body.perluKajian,
-        catatanRisiko: body.catatanRisiko || '',
-        gambarRdtr: body.gambarRdtr,
-      },
-    })
-    return NextResponse.json(wilayah)
+        ...body,
+        // Pastikan koordinat tetap float di tingkat database
+        latitude: parseFloat(body.latitude),
+        longitude: parseFloat(body.longitude),
+      }
+    });
+    
+    return Response.json(updated);
   } catch (error) {
-    console.error('Error updating wilayah:', error)
-    return NextResponse.json({ error: 'Failed to update wilayah' }, { status: 500 })
-  }
-}
-
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    await prisma.wilayah.delete({
-      where: { id: params.id },
-    })
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete wilayah' }, { status: 500 })
+    return Response.json({ error: "Update Failed" }, { status: 500 });
   }
 }

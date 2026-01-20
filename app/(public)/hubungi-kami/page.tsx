@@ -1,11 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Mail, Clock } from "lucide-react"
+import { MapPin, Mail, Clock, Send, CheckCircle2, Phone, MessageSquare, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function HubungiKamiPage() {
@@ -21,83 +20,82 @@ export default function HubungiKamiPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    // Simulate sending email (dalam praktik, ini akan call API endpoint)
+    // Simulasi integrasi API
     setTimeout(() => {
-      console.log("Form submitted:", formData)
       setSubmitted(true)
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" })
       setLoading(false)
-
-      // Reset after 3 seconds
-      setTimeout(() => setSubmitted(false), 3000)
-    }, 1000)
+      setTimeout(() => setSubmitted(false), 5000)
+    }, 1500)
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-white sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Mail className="w-6 h-6 text-primary-foreground" />
+    <main className="min-h-screen bg-slate-50 font-poppins text-slate-900 pb-20">
+      
+      {/* 1. HEADER SECTION - Sticky & Sycronized */}
+      <div className="border-b border-slate-200 bg-white sticky top-0 z-[100] shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          <div className="flex items-center gap-5">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
+              <Mail className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-foreground">Hubungi Kami</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">
+                Hubungi Kami
+              </h1>
+              <p className="text-sm md:text-base text-slate-500 font-bold uppercase tracking-widest mt-2 text-left">
+                Layanan Aduan & Konsultasi Investasi
+              </p>
+            </div>
           </div>
-          <p className="text-muted-foreground ml-13">Kami siap membantu menjawab pertanyaan dan kebutuhan Anda</p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Contact Information */}
+        
+        {/* 2. TOP CONTACT CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
             {
               icon: MapPin,
               title: "Lokasi Kantor",
-              items: ["Jl. Raya Gerung No. 42", "Kabupaten Lombok Barat", "Provinsi NTB 83353"],
+              items: ["Jl. Raya Gerung No. 42", "Lombok Barat, NTB 83353"],
+              color: "bg-blue-600"
             },
             {
               icon: Clock,
               title: "Jam Operasional",
-              items: ["Senin - Jumat", "Pukul 08:00 - 16:00 WIT", "Istirahat: 12:00 - 13:00 WIT"],
+              items: ["Senin - Jumat", "08:00 - 16:00 WITA"],
+              color: "bg-slate-900"
             },
             {
-              icon: Mail,
-              title: "Email",
-              items: [
-                "info@dpmptsp.lombokbarat.go.id",
-                "perizinan@dpmptsp.lombokbarat.go.id",
-                "Respons dalam 1-2 hari kerja",
-              ],
+              icon: MessageSquare,
+              title: "Email Resmi",
+              items: ["info@dpmptsp.lombokbarat.go.id", "Respon: 1-2 Hari Kerja"],
+              color: "bg-blue-500"
             },
           ].map((item, idx) => {
             const Icon = item.icon
             return (
-              <Card key={idx} className="border border-border p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-6 h-6 text-primary" />
+              <Card key={idx} className="border-none shadow-xl p-8 rounded-2xl bg-white group hover:scale-[1.02] transition-transform">
+                <div className="flex flex-col items-center text-center">
+                  <div className={`w-14 h-14 ${item.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
+                    <Icon className="w-7 h-7 text-white" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-3">{item.title}</h3>
-                    <div className="space-y-1">
-                      {item.items.map((line, i) => (
-                        <p key={i} className="text-sm text-muted-foreground">
-                          {line}
-                        </p>
-                      ))}
-                    </div>
+                  <h3 className="font-black text-slate-900 uppercase tracking-tight mb-3">{item.title}</h3>
+                  <div className="space-y-1 text-left w-full flex flex-col items-center">
+                    {item.items.map((line, i) => (
+                      <p key={i} className="text-sm text-slate-500 font-bold uppercase text-center leading-tight">
+                        {line}
+                      </p>
+                    ))}
                   </div>
                 </div>
               </Card>
@@ -105,156 +103,156 @@ export default function HubungiKamiPage() {
           })}
         </div>
 
-        {/* Form Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Form */}
-          <Card className="border border-border p-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Kirim Pesan</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          
+          {/* 3. FORM SECTION - Span 3 */}
+          <div className="lg:col-span-3">
+            <Card className="border-none shadow-2xl rounded-3xl overflow-hidden bg-white">
+              <div className="p-8 md:p-12">
+                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 border-l-8 border-blue-600 pl-6">
+                  Kirim Pesan Digital
+                </h2>
 
-            {submitted ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                <h3 className="text-lg font-semibold text-green-900 mb-2">Pesan Terkirim!</h3>
-                <p className="text-green-800 mb-4">
-                  Terima kasih telah menghubungi kami. Tim DPMPTSP akan merespons dalam 1-2 hari kerja.
-                </p>
+                {submitted ? (
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-10 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-200">
+                        <CheckCircle2 className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-black text-blue-900 uppercase tracking-tight mb-2">Pesan Terkirim!</h3>
+                    <p className="text-blue-700 font-medium">
+                      Terima kasih. Pesan Anda telah masuk ke sistem antrean kami. Tim DPMPTSP akan segera meninjau permohonan Anda.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-900 font-bold focus:border-blue-600 focus:bg-white outline-none transition-all placeholder:text-slate-300"
+                        placeholder="NAMA SESUAI KTP/PERUSAHAAN"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Email Aktif</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-900 font-bold focus:border-blue-600 focus:bg-white outline-none transition-all"
+                          placeholder="EMAIL@KANTOR.COM"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">No. Telepon</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-900 font-bold focus:border-blue-600 focus:bg-white outline-none transition-all"
+                          placeholder="0812-XXXX-XXXX"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Subjek Informasi</label>
+                      <select
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-900 font-bold focus:border-blue-600 focus:bg-white outline-none transition-all appearance-none"
+                      >
+                        <option value="">PILIH TOPIK KONSULTASI</option>
+                        <option value="Informasi Perizinan">INFORMASI PERIZINAN</option>
+                        <option value="Cek Kelayakan Wilayah">CEK KELAYAKAN WILAYAH</option>
+                        <option value="Konsultasi Investasi">KONSULTASI INVESTASI</option>
+                        <option value="Lainnya">LAINNYA</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Detail Pesan</label>
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        rows={5}
+                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-900 font-bold focus:border-blue-600 focus:bg-white outline-none transition-all resize-none"
+                        placeholder="JELASKAN KEBUTUHAN ANDA SECARA DETAIL..."
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-blue-600 hover:bg-slate-900 text-white h-16 rounded-2xl font-black uppercase tracking-widest text-base shadow-xl shadow-blue-200 transition-all flex gap-3"
+                    >
+                      {loading ? (
+                        <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          Kirim Pesan Sekarang <Send size={20} />
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                    Nama Lengkap
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Masukkan nama Anda"
-                  />
-                </div>
+            </Card>
+          </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 border border-border rounded-lg bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="email@example.com"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
-                      Nomor Telepon (Opsional)
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border border-border rounded-lg bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      placeholder="+62 xxx xxxx xxxx"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                    Subjek
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="">Pilih topik pertanyaan...</option>
-                    <option value="Informasi Perizinan">Informasi Perizinan</option>
-                    <option value="Cek Kelayakan Wilayah">Cek Kelayakan Wilayah</option>
-                    <option value="Konsultasi Investasi">Konsultasi Investasi</option>
-                    <option value="Pertanyaan Teknis">Pertanyaan Teknis</option>
-                    <option value="Keluhan dan Saran">Keluhan dan Saran</option>
-                    <option value="Lainnya">Lainnya</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                    Pesan
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={5}
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                    placeholder="Tuliskan pertanyaan atau pesan Anda di sini..."
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-primary hover:bg-primary/90 h-11 font-semibold"
-                >
-                  {loading ? "Mengirim..." : "Kirim Pesan"}
-                </Button>
-              </form>
-            )}
-          </Card>
-
-          {/* Info Section */}
-          <div className="space-y-6">
-            <Card className="border border-border p-6 bg-primary/5">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Bagaimana Kami Bisa Membantu?</h3>
-              <ul className="space-y-3">
-                {[
-                  "Pertanyaan tentang jenis izin yang Anda butuhkan",
-                  "Konfirmasi kelayakan lokasi investasi Anda",
-                  "Panduan lengkap proses perizinan",
-                  "Informasi dokumen yang diperlukan",
-                  "Keluhan atau saran untuk layanan kami",
-                  "Pertanyaan teknis tentang portal ini",
-                ].map((item, idx) => (
-                  <li key={idx} className="flex gap-3 text-foreground">
-                    <span className="text-primary font-bold flex-shrink-0">✓</span>
-                    <span className="text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* 4. SIDEBAR INFO - Span 2 */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="border-none shadow-xl p-8 rounded-3xl bg-slate-900 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl" />
+                <h3 className="text-xl font-black uppercase tracking-tight mb-6 flex items-center gap-3">
+                   <CheckCircle2 className="text-blue-500" /> Kami Membantu:
+                </h3>
+                <ul className="space-y-4">
+                  {[
+                    "KLASIFIKASI IZIN BERUSAHA",
+                    "KONFIRMASI RDTR WILAYAH",
+                    "PANDUAN PROSES PERIZINAN",
+                    "DOKUMEN PERSYARATAN INVESTASI",
+                    "SARAN & KRITIK LAYANAN",
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex gap-4 items-center bg-white/5 p-4 rounded-2xl border border-white/10">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                      <span className="text-xs font-black tracking-widest">{item}</span>
+                    </li>
+                  ))}
+                </ul>
             </Card>
 
-            <Card className="border border-amber-200 bg-amber-50/50 p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">Catatan Penting</h3>
-              <p className="text-sm text-foreground mb-3">
-                Semua pertanyaan akan ditangani oleh tim profesional DPMPTSP Kabupaten Lombok Barat. Kami berkomitmen
-                untuk memberikan respons yang cepat dan akurat.
+            <Card className="border-none shadow-xl p-8 rounded-3xl bg-amber-50 border-l-8 border-amber-500">
+              <h3 className="text-lg font-black text-amber-900 uppercase tracking-tight mb-3">Penting!</h3>
+              <p className="text-sm text-amber-800 font-medium leading-relaxed mb-4">
+                Untuk pertanyaan dengan tingkat urgensi tinggi atau kebutuhan verifikasi dokumen fisik, silakan kunjungi kantor kami secara langsung.
               </p>
-              <p className="text-sm text-foreground">
-                Untuk urgensi tinggi, silakan hubungi kantor kami secara langsung pada jam kerja yang tertera di atas.
-              </p>
+              <div className="flex items-center gap-3 text-amber-900 font-black text-xs uppercase tracking-widest">
+                <Phone size={16} /> (0370) 6789-100
+              </div>
             </Card>
 
-            <Link href="/cek-wilayah">
-              <Button variant="outline" className="w-full bg-transparent">
-                Kembali ke Cek Wilayah
+            <Link href="/cek-wilayah" className="block">
+              <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-slate-200 bg-white text-slate-900 font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition-all flex gap-3">
+                <ArrowLeft size={16} /> Kembali ke Cek Wilayah
               </Button>
             </Link>
           </div>
+
         </div>
       </div>
     </main>

@@ -1,10 +1,22 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { Edit2, Trash2, Plus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { 
+  Edit2, 
+  Trash2, 
+  Plus, 
+  ChevronLeft, 
+  ChevronRight, 
+  Search, 
+  Building2, 
+  Briefcase, 
+  Phone, 
+  Mail,
+  MapPin
+} from "lucide-react"
 
 interface Usaha {
   id: string
@@ -20,10 +32,10 @@ interface Usaha {
 export default function UsahaListPage() {
   const [usahas, setUsahas] = useState<Usaha[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
   
-  // State untuk Pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 7 // <--- Maximal 7 data per halaman sesuai request
+  const itemsPerPage = 7
 
   useEffect(() => {
     fetchUsahas()
@@ -31,108 +43,178 @@ export default function UsahaListPage() {
 
   const fetchUsahas = async () => {
     try {
-      const res = await fetch('/api/usaha')
+      const res = await fetch("/api/usaha")
       const data = await res.json()
       setUsahas(data)
     } catch (error) {
-      console.error('Error fetching usahas:', error)
+      console.error("Error fetching usahas:", error)
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus usaha ini?')) return
-
+    if (!confirm("Apakah Anda yakin ingin menghapus data usaha ini?")) return
     try {
-      const res = await fetch(`/api/usaha/${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        fetchUsahas()
-      }
+      const res = await fetch(`/api/usaha/${id}`, { method: "DELETE" })
+      if (res.ok) fetchUsahas()
     } catch (error) {
-      console.error('Error deleting usaha:', error)
+      console.error("Error deleting usaha:", error)
     }
   }
 
-  // Logika Pagination
-  const totalPages = Math.ceil(usahas.length / itemsPerPage)
+  const filteredUsahas = usahas.filter((u) => 
+    u.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.sektor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.kecamatan.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const totalPages = Math.ceil(filteredUsahas.length / itemsPerPage)
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = usahas.slice(indexOfFirstItem, indexOfLastItem)
+  const currentItems = filteredUsahas.slice(indexOfFirstItem, indexOfLastItem)
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-8 font-poppins pb-10">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Lokasi Usaha</h1>
-          <p className="text-gray-600 mt-2">Kelola semua lokasi usaha yang terdaftar</p>
+          <div className="flex items-center gap-2 text-blue-600 mb-2">
+            <Building2 size={18} />
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Data Management</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">
+            Lokasi Usaha
+          </h1>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-3">
+            Kelola database potensi & unit usaha Kabupaten Lombok Barat
+          </p>
         </div>
-        <Link href="/admin/usaha/tambah">
-          <Button className="gap-2">
-            <Plus className="w-4 h-4" />
-            Tambah Usaha
-          </Button>
-        </Link>
+        
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+            <input 
+              type="text"
+              placeholder="CARI NAMA / SEKTOR..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="pl-11 pr-6 py-3 bg-white border-2 border-slate-100 rounded-2xl text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-blue-600 transition-all w-full sm:w-64 shadow-sm"
+            />
+          </div>
+          <Link href="/admin/usaha/tambah">
+            <Button className="bg-blue-600 hover:bg-slate-900 text-white px-6 py-6 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3">
+              <Plus size={18} /> Tambah Usaha
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <Card>
+      {/* Table Section - FIXED WHITE SPACE */}
+      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
-          ) : usahas.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">Belum ada usaha yang ditambahkan</div>
+            <div className="p-20 text-center">
+              <div className="w-10 h-10 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Sinkronisasi Data...</p>
+            </div>
+          ) : filteredUsahas.length === 0 ? (
+            <div className="p-20 text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <Search size={32} />
+              </div>
+              <p className="text-sm font-black text-slate-500 uppercase tracking-widest">Tidak ada data ditemukan</p>
+            </div>
           ) : (
-            <>
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+            <div className="flex flex-col">
+              <table className="w-full border-separate border-spacing-0">
+                <thead className="bg-slate-900 overflow-hidden">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Nama Usaha</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Sektor</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Lokasi</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Kontak</th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Aksi</th>
+                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] first:rounded-tl-[2.5rem]">
+                      Informasi Usaha
+                    </th>
+                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                      Sektor & Status
+                    </th>
+                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                      Wilayah
+                    </th>
+                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                      Detail Kontak
+                    </th>
+                    <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] last:rounded-tr-[2.5rem]">
+                      Aksi
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-slate-50">
                   {currentItems.map((usaha) => (
-                    <tr key={usaha.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{usaha.nama}</td>
-                      <td className="px-6 py-4 text-gray-600">{usaha.sektor}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            usaha.status.toLowerCase() === 'aktif'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {usaha.status}
-                        </span>
+                    <tr key={usaha.id} className="hover:bg-blue-50/30 transition-colors group">
+                      <td className="px-8 py-5">
+                        <div className="flex flex-col">
+                          <span className="font-black text-slate-900 uppercase tracking-tight text-sm group-hover:text-blue-600 transition-colors">
+                            {usaha.nama}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-1 italic">
+                            ID: {usaha.id.substring(0, 8)}...
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {usaha.kecamatan}, {usaha.desa}
+                      <td className="px-6 py-5">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <Briefcase size={12} className="text-blue-500" />
+                            <span className="text-[11px] font-black text-slate-700 uppercase">{usaha.sektor}</span>
+                          </div>
+                          <span className={`w-fit px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            usaha.status.toLowerCase() === "potensi" || usaha.status.toLowerCase() === "aktif"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-amber-100 text-amber-700"
+                          }`}>
+                            {usaha.status}
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        <div className="text-sm font-semibold">{usaha.nomerTelp}</div>
-                        <div className="text-sm text-gray-400">{usaha.email}</div>
+                      <td className="px-6 py-5">
+                        <div className="flex items-start gap-2">
+                          <MapPin size={14} className="text-slate-400 mt-0.5" />
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-slate-700 uppercase">{usaha.kecamatan}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Desa {usaha.desa}</span>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <Link href={`/admin/usaha/${usaha.id}`}>
-                          <Button variant="outline" size="sm" className="gap-2 bg-transparent border-blue-200 text-blue-600 hover:bg-blue-50">
-                            <Edit2 className="w-4 h-4" />
-                            Edit
+                      <td className="px-6 py-5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-slate-600">
+                            <Phone size={12} />
+                            <span className="text-[11px] font-bold">{usaha.nomerTelp}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-slate-400">
+                            <Mail size={12} />
+                            <span className="text-[10px] font-medium italic">{usaha.email}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/admin/usaha/${usaha.id}`}>
+                            <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2">
+                              <Edit2 className="w-3 h-3" /> Edit
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDelete(usaha.id)}
+                            className="h-9 px-4 rounded-xl bg-slate-900 hover:bg-red-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2"
+                          >
+                            <Trash2 className="w-3 h-3" /> Hapus
                           </Button>
-                        </Link>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(usaha.id)}
-                          className="gap-2 shadow-sm"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Hapus
-                        </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -140,29 +222,31 @@ export default function UsahaListPage() {
               </table>
 
               {/* NAVIGASI PAGINATION */}
-              <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t rounded-b-lg">
-                <div className="text-xs md:text-sm text-gray-500 font-medium">
-                  Data <span className="text-gray-900">{indexOfFirstItem + 1}</span> - <span className="text-gray-900">{Math.min(indexOfLastItem, usahas.length)}</span> dari total <span className="text-gray-900">{usahas.length}</span> usaha
+              <div className="flex flex-col sm:flex-row items-center justify-between px-8 py-6 bg-slate-50 border-t border-slate-100">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 sm:mb-0">
+                  Menampilkan <span className="text-slate-900">{indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredUsahas.length)}</span> Dari <span className="text-slate-900">{filteredUsahas.length}</span> Database
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
+                    className="h-10 w-10 rounded-xl border-slate-200 bg-white hover:bg-blue-600 hover:text-white transition-all p-0"
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
                   
-                  <div className="flex gap-1">
+                  <div className="flex gap-1.5">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <Button
                         key={page}
                         variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
-                        className={`h-8 w-8 p-0 text-xs ${currentPage === page ? 'bg-blue-600' : ''}`}
+                        className={`h-10 w-10 rounded-xl font-black text-xs transition-all p-0 ${
+                          currentPage === page 
+                            ? "bg-blue-600 shadow-lg shadow-blue-200 border-blue-600" 
+                            : "bg-white border-slate-200 text-slate-400 hover:text-blue-600"
+                        }`}
                         onClick={() => setCurrentPage(page)}
                       >
                         {page}
@@ -172,8 +256,7 @@ export default function UsahaListPage() {
 
                   <Button
                     variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
+                    className="h-10 w-10 rounded-xl border-slate-200 bg-white hover:bg-blue-600 hover:text-white transition-all p-0"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages || totalPages === 0}
                   >
@@ -181,7 +264,7 @@ export default function UsahaListPage() {
                   </Button>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </Card>

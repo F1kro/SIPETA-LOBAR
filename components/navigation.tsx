@@ -21,11 +21,17 @@ export function Navigation() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Fungsi pembantu untuk cek status aktif
+  const isActive = (href: string) => {
+    // Menu aktif jika path cocok, ATAU jika ini menu Konsultasi dan kita sedang di Hubungi Kami
+    return pathname === href || (href === "/konsultasi" && pathname === "/hubungi-kami")
+  }
+
   return (
     <nav className="sticky top-0 z-[9999] border-b border-slate-100 bg-white/90 backdrop-blur-md shadow-sm">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo & Brand - Konsisten Biru */}
+          {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
               <MapPin className="w-6 h-6 text-white" />
@@ -44,7 +50,7 @@ export function Navigation() {
                 href={item.href}
                 className={cn(
                   "px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                  pathname === item.href
+                  isActive(item.href)
                     ? "bg-blue-50 text-blue-600"
                     : "text-slate-500 hover:bg-slate-50 hover:text-blue-600",
                 )}
@@ -63,8 +69,7 @@ export function Navigation() {
           </button>
         </div>
 
-        {/* Mobile Navigation - Fix Dropdown */}
-        {/* Mobile Navigation - Update Spacing & Padding */}
+        {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-6 pt-2 space-y-1 animate-in fade-in slide-in-from-top-4 duration-300">
             {navItems.map((item) => (
@@ -73,8 +78,8 @@ export function Navigation() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "block px-4 py-3 rounded-xl text-sm font-bold transition-colors", // py dikurangi dari 4 ke 3
-                  pathname === item.href
+                  "block px-4 py-3 rounded-xl text-sm font-bold transition-colors",
+                  isActive(item.href)
                     ? "bg-blue-600 text-white shadow-md shadow-blue-200"
                     : "text-slate-600 hover:bg-slate-50",
                 )}
