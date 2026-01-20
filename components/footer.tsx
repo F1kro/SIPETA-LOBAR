@@ -9,12 +9,13 @@ export function Footer() {
 
   // Sembunyikan footer jika berada di rute admin
   if (pathname.startsWith('/admin')) return null
+  if (pathname.startsWith('/auth')) return null
 
   return (
     <footer className="bg-white border-t border-slate-200 pt-16 pb-8 font-poppins text-left">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 text-left">
-          
+
           {/* Kolom 1: Brand & Deskripsi (Span 5) */}
           <div className="md:col-span-5 space-y-6">
             <div className="flex items-center gap-4 justify-start">
@@ -30,7 +31,7 @@ export function Footer() {
                 </p>
               </div>
             </div>
-            <p className="text-slate-500 font-semibold leading-relaxed text-lg max-w-md">
+            <p className="text-slate-500 font-medium leading-relaxed text-lg max-w-md">
               Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu berkomitmen memberikan kemudahan bagi para investor melalui data yang transparan dan akurat.
             </p>
           </div>
@@ -67,19 +68,44 @@ export function Footer() {
           {/* Kolom 3: Layanan & Jam Operasional (Span 4) */}
           <div className="md:col-span-4 text-left">
             <h6 className="font-black text-slate-900 uppercase tracking-widest text-sm mb-8 border-l-4 border-blue-600 pl-4">
-              Jam Pelayanan
+              Informasi Kontak
             </h6>
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4 shadow-inner">
-              <div className="flex items-center gap-4">
-                <Clock className="text-blue-600 w-6 h-6" />
-                <div>
-                  <p className="text-slate-500 font-black text-[10px] uppercase tracking-widest">Senin - Jumat</p>
-                  <p className="text-2xl font-black text-slate-900 leading-none mt-1">08:00 - 16:00</p>
+
+            <div className="space-y-4">
+              {/* BAGIAN ALAMAT - Style disamakan dengan Jam Pelayanan */}
+              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4 shadow-inner">
+                <div className="flex items-start gap-4">
+                  <MapPin className="text-blue-600 w-6 h-6 shrink-0 mt-1" />
+                  <div>
+                    <p className="text-slate-500 font-black text-[10px] uppercase tracking-widest">Alamat Kantor</p>
+                    <p className="text-base font-black text-slate-900 leading-snug mt-1 uppercase">
+                      Jl. Raya Gerung Utama No. 42, <br />
+                      Gerung, Kabupaten Lombok Barat, <br />
+                      Nusa Tenggara Barat 83311
+                    </p>
+                  </div>
                 </div>
+                <div className="h-px bg-slate-200 w-full" />
+                <p className="text-[11px] font-bold text-slate-400 italic leading-tight">
+                  *Terletak di pusat pemerintahan Kabupaten Lombok Barat.
+                </p>
               </div>
-              <p className="text-[11px] font-bold text-slate-400 italic leading-tight">
-                *Waktu Indonesia Tengah (WITA). Kantor tutup pada hari Sabtu, Minggu, dan Libur Nasional.
-              </p>
+
+              {/* BAGIAN JAM PELAYANAN */}
+              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4 shadow-inner">
+                <div className="flex items-center gap-4">
+                  <Clock className="text-blue-600 w-6 h-6 shrink-0" />
+                  <div>
+                    <p className="text-slate-500 font-black text-[10px] uppercase tracking-widest">Jam Pelayanan</p>
+                    <p className="text-2xl font-black text-slate-900 leading-none mt-1">08:00 - 16:00</p>
+                    <p className="text-slate-500 font-bold text-[11px] mt-1 uppercase tracking-tighter">Senin - Jumat</p>
+                  </div>
+                </div>
+                <div className="h-px bg-slate-200 w-full" />
+                <p className="text-[11px] font-bold text-slate-400 italic leading-tight">
+                  *Waktu Indonesia Tengah (WITA). Kantor tutup pada hari Sabtu, Minggu, dan Libur Nasional.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -89,13 +115,7 @@ export function Footer() {
 
         {/* Footer Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-left">
-            <p className="text-xs font-bold text-slate-400 italic leading-relaxed">
-              <strong>Disclaimer:</strong> Informasi yang ditampilkan bersifat indikatif sebagai panduan awal. <br />
-              Kepastian pemanfaatan ruang mengacu pada RDTR Kabupaten Lombok Barat.
-            </p>
-          </div>
-          <div className="flex flex-col items-center md:items-end gap-2">
+          <div className="flex flex-col items-center md:items-start gap-2">
             <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">
               © 2026 DPMPTSP KABUPATEN LOMBOK BARAT
             </p>
