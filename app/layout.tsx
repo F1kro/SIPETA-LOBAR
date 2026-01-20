@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "DPMPTSP Kabupaten Lombok Barat - Panduan Investasi Wilayah",
   description:
     "Portal layanan informasi investasi dan perizinan DPMPTSP Kabupaten Lombok Barat. Cek potensi investasi wilayah Anda secara indikatif.",
-  generator: "v0.app",
+  generator: "Fiqro Najiah",
   icons: {
     icon: [
       {
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/icon.png",
+        type: "image/png",
       },
     ],
     apple: "/apple-icon.png",
