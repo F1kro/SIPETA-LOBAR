@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { 
   Save, Loader2, Building2, MapPin, Phone, 
   Mail, Globe, Calendar, Wallet, Info, 
-  ShieldCheck, Image as ImageIcon, FileText, ChevronDown 
+  ShieldCheck, Image as ImageIcon, FileText, ChevronDown, User 
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -20,6 +20,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
   
   const [formData, setFormData] = useState({
     nama: initialData?.nama || '',
+    namaPemilik: initialData?.namaPemilik || '', // Field Baru
     deskripsi: initialData?.deskripsi || '',
     sektor: initialData?.sektor || '',
     status: initialData?.status || 'Aktif',
@@ -88,11 +89,13 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
     e.preventDefault()
     setLoading(true)
     setError(null)
+    
     if (!formData.latitude || !formData.longitude) {
       setError('Koordinat lokasi wajib diisi')
       setLoading(false)
       return
     }
+
     try {
       const dataToSubmit = {
         ...formData,
@@ -101,15 +104,19 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
         investasi: formData.investasi ? String(formData.investasi) : null,
         tahunBerdiri: formData.tahunBerdiri ? Number(formData.tahunBerdiri) : null,
       }
+      
       const url = initialData?.id ? `/api/usaha/${initialData.id}` : '/api/usaha'
       const method = initialData?.id ? 'PUT' : 'POST'
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSubmit),
       })
+      
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan')
+      
       if (onSuccess) onSuccess()
     } catch (err: any) {
       setError(err.message)
@@ -118,11 +125,10 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
     }
   }
 
-  // CSS class helper untuk input yang konsisten dan kontras
   const inputClassName = "w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8 text-left font-poppins">
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl flex items-center gap-3 animate-in fade-in">
           <p className="text-red-700 text-xs font-black uppercase tracking-tight">{error}</p>
@@ -139,6 +145,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="text"
             name="nama"
+            placeholder="CONTOH: RESORT SENGGIGI"
             value={formData.nama}
             onChange={handleChange}
             className={inputClassName}
@@ -146,7 +153,23 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           />
         </div>
 
-        {/* Sektor - Dropdown dengan Panah */}
+        {/* Nama Pemilik (BARU) */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <User size={12} className="text-blue-600" /> Nama Pemilik / Direktur *
+          </label>
+          <input
+            type="text"
+            name="namaPemilik"
+            placeholder="NAMA LENGKAP PEMILIK"
+            value={formData.namaPemilik}
+            onChange={handleChange}
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        {/* Sektor */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
             <Info size={12} className="text-blue-600" /> Sektor *
@@ -156,7 +179,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
               name="sektor"
               value={formData.sektor}
               onChange={handleChange}
-              className={`${inputClassName} appearance-none pr-10`}
+              className={`${inputClassName} appearance-none pr-10 font-bold`}
               required
             >
               <option value="">Pilih Sektor</option>
@@ -166,7 +189,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           </div>
         </div>
 
-        {/* Status - Dropdown dengan Panah */}
+        {/* Status */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
             <ShieldCheck size={12} className="text-blue-600" /> Status
@@ -176,7 +199,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className={`${inputClassName} appearance-none pr-10`}
+              className={`${inputClassName} appearance-none pr-10 font-bold`}
             >
               {statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}
             </select>
@@ -208,6 +231,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="text"
             name="kecamatan"
+            placeholder="MASUKKAN KECAMATAN"
             value={formData.kecamatan}
             onChange={handleChange}
             className={inputClassName}
@@ -223,6 +247,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="text"
             name="desa"
+            placeholder="MASUKKAN DESA"
             value={formData.desa}
             onChange={handleChange}
             className={inputClassName}
@@ -238,6 +263,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="email"
             name="email"
+            placeholder="admin@bisnis.com"
             value={formData.email}
             onChange={handleChange}
             className={inputClassName}
@@ -253,6 +279,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="tel"
             name="nomerTelp"
+            placeholder="081XXXXXXX"
             value={formData.nomerTelp}
             onChange={handleChange}
             className={inputClassName}
@@ -268,14 +295,15 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="number"
             name="investasi"
+            placeholder="JUMLAH DALAM RUPIAH"
             value={formData.investasi}
             onChange={handleChange}
             className={inputClassName}
           />
         </div>
 
-        {/* KOORDINAT */}
-        <div className="md:col-span-2 space-y-2">
+        {/* Koordinat */}
+        <div className="md:col-span-2 lg:col-span-2 space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
             <Globe size={12} className="text-blue-600" /> Koordinat (Google Maps) *
           </label>
@@ -303,6 +331,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           <input
             type="url"
             name="gambar"
+            placeholder="https://..."
             value={formData.gambar}
             onChange={handleChange}
             className={inputClassName}
@@ -319,21 +348,22 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
             value={formData.deskripsi}
             onChange={handleChange}
             rows={3}
-            className={`${inputClassName} resize-none`}
+            placeholder="Ceritakan singkat tentang unit usaha ini..."
+            className={`${inputClassName} resize-none font-bold`}
           />
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end pt-4 border-t border-slate-50">
         <Button
           type="submit"
           disabled={loading || !!coordinateError}
-          className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3"
+          className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3 active:scale-95"
         >
           {loading ? (
             <><Loader2 className="animate-spin" size={18} /> Memproses...</>
           ) : (
-            <>{initialData?.id ? 'Update Data' : 'Tambah Usaha'} <Save size={18} /></>
+            <>{initialData?.id ? 'Perbarui Data' : 'Simpan Database'} <Save size={18} /></>
           )}
         </Button>
       </div>

@@ -10,36 +10,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  SUPERADMIN
+  PEGAWAI
+}
+
 model Admin {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
+  role      Role     @default(PEGAWAI) // Default sebagai pegawai
   createdAt DateTime @default(now()) @map("dibuat_pada")
 
   @@map("admin")
 }
 
 model Usaha {
-  id         String   @id @default(cuid())
-  nama       String   @db.VarChar(255)
-  sektor     String   @db.VarChar(100)
-  status     String   @db.VarChar(50)
-  latitude   Float
-  longitude  Float
-  kecamatan  String   @db.VarChar(100)
-  desa       String   @db.VarChar(100)
-  nomerTelp  String   @db.VarChar(20) @map("nomer_telp")
-  email      String   @db.VarChar(255)
-  deskripsi  String?  @db.Text
-  gambar     String?  @db.VarChar(500)
-  investasi  BigInt?  @map("investasi")
-  tahunBerdiri Int?   @map("tahun_berdiri")
-  createdAt  DateTime @default(now()) @map("dibuat_pada")
-  updatedAt  DateTime @updatedAt @map("diupdate_pada")
+  id           String   @id @default(cuid())
+  nama         String   @db.VarChar(255)
+  namaPemilik  String   @db.VarChar(255) @map("nama_pemilik") // Kolom Baru
+  sektor       String   @db.VarChar(100)
+  status       String   @db.VarChar(50)
+  latitude     Float
+  longitude    Float
+  kecamatan    String   @db.VarChar(100)
+  desa         String   @db.VarChar(100)
+  nomerTelp    String   @db.VarChar(20) @map("nomer_telp")
+  email        String   @db.VarChar(255)
+  deskripsi    String?  @db.Text
+  gambar       String?  @db.VarChar(500)
+  investasi    BigInt?  @map("investasi")
+  tahunBerdiri Int?     @map("tahun_berdiri")
+  createdAt    DateTime @default(now()) @map("dibuat_pada")
+  updatedAt    DateTime @updatedAt @map("diupdate_pada")
 
   @@map("usaha")
 }
-
 model Wilayah {
   id            String   @id @default(cuid())
   kecamatan     String   @db.VarChar(100)

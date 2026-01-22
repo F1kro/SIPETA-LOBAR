@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Lock, Mail, MapPin, Shield } from "lucide-react"
+import { Eye, EyeOff, Lock, Mail, MapPin } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -23,6 +23,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      // Pastikan endpoint API sesuai dengan file route yang kamu buat sebelumnya
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,6 +38,14 @@ export default function LoginPage() {
         return
       }
 
+      // --- PERBAIKAN DI SINI ---
+      // Simpan role ke localStorage agar Sidebar bisa membacanya
+      // Kita mengambil 'role' dari objek 'user' yang dikirim oleh API
+      if (data.user && data.user.role) {
+        localStorage.setItem("role", data.user.role)
+      }
+      // -------------------------
+
       router.push("/admin")
       router.refresh()
     } catch (err) {
@@ -46,14 +55,11 @@ export default function LoginPage() {
   }
 
   return (
-    // Menggunakan h-screen dan overflow-hidden agar fix tidak bisa scroll
-    <div className="h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden relative">
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 overflow-hidden relative font-poppins">
       
-      {/* Background Decor */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
       <div className="relative z-10 w-full max-w-[380px] px-4">
-        {/* Logo Section - Ukuran diperkecil */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl mb-3 shadow-lg shadow-blue-500/40">
             <MapPin className="w-7 h-7 text-white" />
@@ -66,7 +72,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Form Card - Sangat Compact */}
         <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md rounded-2xl">
           <CardHeader className="pt-6 pb-4 space-y-0 text-center">
             <CardTitle className="text-lg font-black text-slate-800 uppercase tracking-tight">
@@ -87,7 +92,7 @@ export default function LoginPage() {
                 </Alert>
               )}
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 text-left">
                 <Label htmlFor="email" className="text-[11px] font-black text-slate-500 uppercase ml-1">
                   Email
                 </Label>
@@ -101,12 +106,12 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="pl-9 h-11 rounded-xl border-slate-200 text-sm focus:ring-blue-600 bg-slate-50/50"
+                    className="pl-9 h-11 rounded-xl border-slate-200 text-sm focus:ring-blue-600 bg-slate-50/50 font-bold"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 text-left">
                 <Label htmlFor="password" className="text-[11px] font-black text-slate-500 uppercase ml-1">
                   Password
                 </Label>
@@ -120,7 +125,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="pl-9 pr-10 h-11 rounded-xl border-slate-200 text-sm focus:ring-blue-600 bg-slate-50/50"
+                    className="pl-9 pr-10 h-11 rounded-xl border-slate-200 text-sm focus:ring-blue-600 bg-slate-50/50 font-bold"
                   />
                   <button
                     type="button"
@@ -134,7 +139,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-blue-600/30 transition-all active:scale-95"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-blue-600/30 transition-all active:scale-95"
                 disabled={loading}
               >
                 {loading ? "Memproses..." : "Masuk Sekarang"}
@@ -143,7 +148,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Copyright - Ukuran Kecil */}
         <div className="mt-6 text-center">
             <p className="text-[10px] text-blue-300/60 font-medium uppercase tracking-widest">
                 © 2026 Pemerintah Kab. Lombok Barat

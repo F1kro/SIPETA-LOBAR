@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find admin by email
+    // Cari admin berdasarkan email
     const admin = await prisma.admin.findUnique({
       where: { email },
     })
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify password
+    // Verifikasi password
     const isValidPassword = await bcrypt.compare(password, admin.password)
 
     if (!isValidPassword) {
@@ -36,14 +36,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create session
+    // Simpan session (Pastikan fungsi setSession kamu bisa menerima role jika diperlukan)
     await setSession(admin.id, admin.email)
 
+    // KEMBALIKAN DATA ROLE KE FRONTEND
     return NextResponse.json({
       success: true,
       user: {
         id: admin.id,
         email: admin.email,
+        role: admin.role, // <-- WAJIB ADA INI
       },
     })
   } catch (error) {

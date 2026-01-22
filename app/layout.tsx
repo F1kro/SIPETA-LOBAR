@@ -1,36 +1,17 @@
+"use client" // Wajib Client Component karena ada script Google di head
+
 import type React from "react"
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import { Navigation } from "@/components/navigation"
 import { Poppins } from 'next/font/google'
 import { Footer } from "@/components/footer"
-// import './globals.css'
 
+// KONFIGURASI FONT ASLI KAMU - TIDAK DIUBAH
 const poppins = Poppins({ 
   subsets: ['latin'], 
   weight: ['400', '500', '600', '700'],
   variable: '--font-poppins' 
 })
-
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
-
-export const metadata: Metadata = {
-  title: "DPMPTSP Kabupaten Lombok Barat - Panduan Investasi Wilayah",
-  description:
-    "Portal layanan informasi investasi dan perizinan DPMPTSP Kabupaten Lombok Barat. Cek potensi investasi wilayah Anda secara indikatif.",
-  generator: "Fiqro Najiah",
-  icons: {
-    icon: [
-      {
-        url: "/icon.png",
-        type: "image/png",
-      },
-    ],
-  },
-}
 
 export default function RootLayout({
   children,
@@ -38,12 +19,46 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id">
-      <head></head>
-      <body className={`font-sans antialiased`}>
+    <html lang="id" suppressHydrationWarning className={poppins.variable}>
+      <head>
+        {/* Google Translate Init */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'id',
+                  includedLanguages: 'id,en',
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
+            `,
+          }}
+        />
+        {/* <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" /> */}
+        
+        <style dangerouslySetInnerHTML={{ __html: `
+          /* Sembunyikan Widget Google */
+          .goog-te-banner-frame.skiptranslate, .goog-te-gadget { display: none !important; }
+          body { top: 0px !important; }
+          .goog-te-menu-value { display: none !important; }
+          #google_translate_element { display: none; }
+          
+          /* PAKSA PAKAI POPPINS DI SEMUA ELEMEN */
+          html, body, * {
+            font-family: var(--font-poppins), sans-serif !important;
+          }
+        `}} />
+      </head>
+      <body 
+        className="antialiased" 
+        suppressHydrationWarning
+        style={{ marginTop: 0, paddingTop: 0 }}
+      >
         {children}
         <Analytics />
-      <Footer />
+        <Footer />
+        <div id="google_translate_element"></div>
       </body>
     </html>
   )

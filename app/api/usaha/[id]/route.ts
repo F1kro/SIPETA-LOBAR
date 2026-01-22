@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: 'Usaha not found' }, { status: 404 })
     }
 
-    // Convert BigInt to string
+    // Convert BigInt to string agar tidak error saat JSON serialization
     const serializedUsaha = {
       ...usaha,
       investasi: usaha.investasi ? usaha.investasi.toString() : null,
@@ -46,7 +46,7 @@ export async function PUT(
     const { id } = await params
     const body = await req.json()
 
-    // Check if usaha exists
+    // Cek apakah data usaha ada
     const existingUsaha = await prisma.usaha.findUnique({
       where: { id },
     })
@@ -59,6 +59,7 @@ export async function PUT(
       where: { id },
       data: {
         nama: body.nama,
+        namaPemilik: body.namaPemilik, // --- UPDATE NAMA PEMILIK ---
         sektor: body.sektor,
         status: body.status,
         latitude: parseFloat(body.latitude),
@@ -104,7 +105,6 @@ export async function DELETE(
 
     const { id } = await params
 
-    // Check if usaha exists
     const existingUsaha = await prisma.usaha.findUnique({
       where: { id },
     })

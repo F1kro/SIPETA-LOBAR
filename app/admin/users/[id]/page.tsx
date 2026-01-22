@@ -5,19 +5,30 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ShieldCheck, Lock, Mail, Save, XCircle, Loader2, Calendar, UserCog } from 'lucide-react'
+import { 
+  ArrowLeft, 
+  ShieldCheck, 
+  Lock, 
+  Mail, 
+  Save, 
+  XCircle, 
+  Loader2, 
+  Calendar, 
+  UserCog 
+} from 'lucide-react'
 import Link from 'next/link'
 
 interface Admin {
   id: string
   email: string
+  role: string // Tambahkan role di interface
   createdAt: string
 }
 
 export default function EditAdminPage() {
   const router = useRouter()
   const params = useParams()
-  const id = params?.id // Ambil ID dari URL
+  const id = params?.id
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -26,11 +37,11 @@ export default function EditAdminPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    role: '', // Tambahkan state role
   })
   const [error, setError] = useState('')
 
   useEffect(() => {
-    // Pastikan ID ada sebelum fetch
     if (id) {
       fetchAdmin()
     }
@@ -45,13 +56,11 @@ export default function EditAdminPage() {
       
       const data = await res.json()
       
-      // Update state admin untuk info header
       setAdmin(data)
-      
-      // Update state form untuk inputan email
       setFormData(prev => ({ 
         ...prev, 
-        email: data.email 
+        email: data.email,
+        role: data.role // Set role dari database
       }))
       
     } catch (error) {
@@ -84,6 +93,7 @@ export default function EditAdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
+          role: formData.role, // Kirim update role
           password: formData.password || undefined,
         }),
       })
@@ -95,7 +105,7 @@ export default function EditAdminPage() {
       }
 
       router.push('/admin/users')
-      router.refresh() // Paksa refresh data di list page
+      router.refresh()
     } catch (error) {
       setError('Terjadi kesalahan koneksi')
     } finally {
@@ -115,20 +125,20 @@ export default function EditAdminPage() {
   const inputClassName = "w-full px-5 py-3.5 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm placeholder:text-slate-300"
 
   return (
-    <div className="space-y-6 font-poppins pb-10 animate-in fade-in duration-500">
+    <div className="space-y-6 font-poppins pb-10 animate-in fade-in duration-500 text-left">
       
       {/* 1. HEADER SECTION */}
-      <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-between px-2 text-left">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 shrink-0">
             <UserCog className="w-6 h-6 text-blue-500" />
           </div>
-          <div>
+          <div className="text-left">
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">
               Edit Akun Admin
             </h1>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-              Perbarui kredensial akses pengelola sistem
+              Perbarui kredensial dan otoritas akses pengelola
             </p>
           </div>
         </div>
@@ -161,7 +171,6 @@ export default function EditAdminPage() {
                 <h2 className="text-white font-black uppercase tracking-widest text-[10px]">Keamanan & Otoritas Akun</h2>
              </div>
              
-             {/* Perbaikan Date Display */}
              {admin?.createdAt && (
                <div className="relative z-10 hidden md:flex items-center gap-2 text-slate-400 text-[9px] font-black uppercase">
                  <Calendar size={12} /> Terdaftar: {new Date(admin.createdAt).toLocaleDateString('id-ID', {
@@ -173,10 +182,11 @@ export default function EditAdminPage() {
              )}
           </div>
 
-          <div className="p-8 md:p-10">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="p-8 md:p-10 text-left">
+            {/* Grid 4 Kolom agar seimbang dengan field Role baru */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
               
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Mail size={12} className="text-blue-600" /> Email Admin
                 </label>
@@ -189,7 +199,21 @@ export default function EditAdminPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <UserCog size={12} className="text-blue-600" /> Otoritas Role
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className={inputClassName}
+                >
+                  <option value="PEGAWAI">PEGAWAI / STAFF</option>
+                  <option value="SUPERADMIN">SUPERADMIN</option>
+                </select>
+              </div>
+
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Password Baru
                 </label>
@@ -202,7 +226,7 @@ export default function EditAdminPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Konfirmasi Password
                 </label>
@@ -211,7 +235,7 @@ export default function EditAdminPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   className={inputClassName}
-                  placeholder="ULANGI PASSWORD BARU"
+                  placeholder="ULANGI PASSWORD"
                   disabled={!formData.password}
                 />
               </div>

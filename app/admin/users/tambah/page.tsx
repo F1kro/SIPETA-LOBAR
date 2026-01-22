@@ -5,7 +5,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, UserPlus, ShieldCheck, Lock, Mail, Save, XCircle, Loader2 } from 'lucide-react'
+import { 
+  ArrowLeft, 
+  UserPlus, 
+  ShieldCheck, 
+  Lock, 
+  Mail, 
+  Save, 
+  XCircle, 
+  Loader2, 
+  UserCog 
+} from 'lucide-react'
 import Link from 'next/link'
 
 export default function TambahAdminPage() {
@@ -15,6 +25,7 @@ export default function TambahAdminPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'PEGAWAI', // Default role sesuai schema
   })
   const [error, setError] = useState('')
 
@@ -41,6 +52,7 @@ export default function TambahAdminPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          role: formData.role, // Kirim role ke API
         }),
       })
 
@@ -60,19 +72,19 @@ export default function TambahAdminPage() {
     }
   }
 
-  // Helper untuk style input yang konsisten dan kontras
+  // Helper untuk style input tetap konsisten
   const inputClassName = "w-full px-5 py-3.5 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm placeholder:text-slate-300"
 
   return (
-    <div className="space-y-6 font-poppins pb-10 animate-in fade-in duration-500">
+    <div className="space-y-6 font-poppins pb-10 animate-in fade-in duration-500 text-left">
       
       {/* 1. HEADER SECTION */}
-      <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-between px-2 text-left">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
             <UserPlus className="w-6 h-6 text-white" />
           </div>
-          <div>
+          <div className="text-left">
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">
               Tambah Admin Baru
             </h1>
@@ -109,16 +121,16 @@ export default function TambahAdminPage() {
              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
              <div className="flex items-center gap-3 relative z-10">
                 <ShieldCheck className="text-blue-500" size={18} />
-                <h2 className="text-white font-black uppercase tracking-widest text-[10px]">Kredensial Keamanan Akun</h2>
+                <h2 className="text-white font-black uppercase tracking-widest text-[10px]">Kredensial & Otoritas Akun</h2>
              </div>
           </div>
 
-          <div className="p-8 md:p-10">
-            {/* Grid 3 Kolom untuk PC agar tidak scroll */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="p-8 md:p-10 text-left">
+            {/* Grid 4 Kolom agar tetap muat dalam satu baris di layar lebar */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
               
               {/* Kolom 1: Email */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Mail size={12} className="text-blue-600" /> Email Address
                 </label>
@@ -133,7 +145,7 @@ export default function TambahAdminPage() {
               </div>
 
               {/* Kolom 2: Password */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Password
                 </label>
@@ -148,7 +160,7 @@ export default function TambahAdminPage() {
               </div>
 
               {/* Kolom 3: Konfirmasi */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Konfirmasi Password
                 </label>
@@ -160,6 +172,21 @@ export default function TambahAdminPage() {
                   className={inputClassName}
                   placeholder="ULANGI PASSWORD"
                 />
+              </div>
+
+              {/* Kolom 4: Role Selection (Baru) */}
+              <div className="space-y-2 text-left">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <UserCog size={12} className="text-blue-600" /> Otoritas Role
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className={inputClassName}
+                >
+                  <option value="PEGAWAI">PEGAWAI / STAFF</option>
+                  <option value="SUPERADMIN">SUPERADMIN</option>
+                </select>
               </div>
 
             </div>

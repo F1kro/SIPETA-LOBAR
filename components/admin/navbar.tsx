@@ -62,7 +62,7 @@ export function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
             </div>
             <div className="hidden md:block">
               <h1 className="text-lg font-black text-slate-900 uppercase tracking-tighter leading-none">Admin Panel</h1>
-              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">Management System</p>
+              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">Sistem informasi peta investasi - Lombok Barat</p>
             </div>
           </div>
         </div>

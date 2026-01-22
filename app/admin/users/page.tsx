@@ -14,12 +14,15 @@ import {
   ChevronLeft, 
   ChevronRight,
   Mail,
-  Calendar
+  Calendar,
+  UserCheck,
+  UserCog
 } from 'lucide-react'
 
 interface Admin {
   id: string
   email: string
+  role: 'SUPERADMIN' | 'PEGAWAI' // Update interface sesuai schema
   createdAt: string
 }
 
@@ -28,12 +31,14 @@ export default function UsersListPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 7
+  // LOGIKA ROLE: Ambil role user yang sedang login dari localStorage/Session
+  // Admin biasa (PEGAWAI) tidak bisa melihat tombol Tambah, Edit, dan Hapus
+  const [currentAdminRole, setCurrentAdminRole] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAdmins()
+    const role = localStorage.getItem('role') // Sesuaikan dengan cara kamu simpan session
+    setCurrentAdminRole(role)
   }, [])
 
   const fetchAdmins = async () => {
@@ -59,6 +64,10 @@ export default function UsersListPage() {
     }
   }
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 7
+
   // Filter Search
   const filteredAdmins = admins.filter((admin) => 
     admin.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -69,6 +78,8 @@ export default function UsersListPage() {
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = filteredAdmins.slice(indexOfFirstItem, indexOfLastItem)
+
+  const isSuperAdmin = currentAdminRole === 'SUPERADMIN'
 
   return (
     <div className="space-y-8 font-poppins pb-10">
@@ -101,11 +112,15 @@ export default function UsersListPage() {
               className="pl-11 pr-6 py-3 bg-white border-2 border-slate-100 rounded-2xl text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-blue-600 transition-all w-full sm:w-64 shadow-sm"
             />
           </div>
-          <Link href="/admin/users/tambah">
-            <Button className="bg-blue-600 hover:bg-slate-900 text-white px-6 py-6 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3">
-              <Plus size={18} /> Tambah Admin
-            </Button>
-          </Link>
+          
+          {/* TOMBOL TAMBAH: Hanya muncul untuk Superadmin */}
+          {isSuperAdmin && (
+            <Link href="/admin/users/tambah">
+              <Button className="bg-blue-600 hover:bg-slate-900 text-white px-6 py-6 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3">
+                <Plus size={18} /> Tambah Admin
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -150,9 +165,17 @@ export default function UsersListPage() {
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-2">
-                          <ShieldCheck size={14} className="text-blue-500" />
-                          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                            Administrator
+                          {admin.role === 'SUPERADMIN' ? (
+                            <ShieldCheck size={14} className="text-blue-500" />
+                          ) : (
+                            <UserCog size={14} className="text-slate-400" />
+                          )}
+                          <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            admin.role === 'SUPERADMIN' 
+                            ? "bg-blue-100 text-blue-700" 
+                            : "bg-slate-100 text-slate-600"
+                          }`}>
+                            {admin.role === 'SUPERADMIN' ? 'Superadmin' : 'Pegawai'}
                           </span>
                         </div>
                       </td>
@@ -169,21 +192,26 @@ export default function UsersListPage() {
                         </div>
                       </td>
                       <td className="px-8 py-5 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Link href={`/admin/users/${admin.id}`}>
-                            <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2">
-                              <Edit2 className="w-3 h-3" /> Edit
+                        {/* AKSI: Hanya muncul jika user yang login adalah SUPERADMIN */}
+                        {isSuperAdmin ? (
+                          <div className="flex justify-end gap-2">
+                            <Link href={`/admin/users/${admin.id}`}>
+                              <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2">
+                                <Edit2 className="w-3 h-3" /> Edit
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDelete(admin.id)}
+                              className="h-9 px-4 rounded-xl bg-slate-900 hover:bg-red-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2"
+                            >
+                              <Trash2 className="w-3 h-3" /> Hapus
                             </Button>
-                          </Link>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(admin.id)}
-                            className="h-9 px-4 rounded-xl bg-slate-900 hover:bg-red-600 transition-all font-black text-[10px] uppercase tracking-widest gap-2"
-                          >
-                            <Trash2 className="w-3 h-3" /> Hapus
-                          </Button>
-                        </div>
+                          </div>
+                        ) : (
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest italic">Read Only</span>
+                        )}
                       </td>
                     </tr>
                   ))}

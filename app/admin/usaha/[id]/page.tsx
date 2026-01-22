@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { 
   ArrowLeft, Building2, X, Save, Loader2, MapPin, Phone, 
   Mail, Globe, Calendar, Wallet, Info, ShieldCheck, 
-  Image as ImageIcon, FileText, ChevronDown, Edit3 
+  Image as ImageIcon, FileText, ChevronDown, Edit3, User 
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -24,6 +24,7 @@ export default function EditUsahaPage() {
   
   const [formData, setFormData] = useState({
     nama: '',
+    namaPemilik: '', // Tambahkan field baru
     sektor: '',
     status: 'aktif',
     latitude: '',
@@ -38,18 +39,35 @@ export default function EditUsahaPage() {
     tahunBerdiri: '',
   })
 
-  // State untuk input koordinat gabungan
   const [coordinates, setCoordinates] = useState('')
 
   useEffect(() => {
-    fetchUsaha()
+    if (params.id) fetchUsaha()
   }, [params.id])
 
   const fetchUsaha = async () => {
     try {
       const res = await fetch(`/api/usaha/${params.id}`)
       const data = await res.json()
-      setFormData(data)
+      
+      // FIX NULL ERROR: Gunakan "|| ''" untuk setiap field yang mungkin null di database
+      setFormData({
+        nama: data.nama || '',
+        namaPemilik: data.namaPemilik || '', // Mapping field baru
+        sektor: data.sektor || '',
+        status: data.status || 'aktif',
+        latitude: data.latitude?.toString() || '',
+        longitude: data.longitude?.toString() || '',
+        kecamatan: data.kecamatan || '',
+        desa: data.desa || '',
+        nomerTelp: data.nomerTelp || '',
+        email: data.email || '',
+        deskripsi: data.deskripsi || '',
+        gambar: data.gambar || '',
+        investasi: data.investasi || '',
+        tahunBerdiri: data.tahunBerdiri || '',
+      })
+
       if (data.latitude && data.longitude) {
         setCoordinates(`${data.latitude}, ${data.longitude}`)
       }
@@ -60,7 +78,6 @@ export default function EditUsahaPage() {
     }
   }
 
-  // Fungsi Parser Koordinat (Sama dengan Form Tambah)
   const parseCoordinates = (input: string) => {
     setCoordinateError(null)
     const cleaned = input.trim()
@@ -132,9 +149,8 @@ export default function EditUsahaPage() {
   const inputClassName = "w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
 
   return (
-    <div className="font-poppins pb-10 w-full max-w-[1400px] mx-auto animate-in fade-in duration-500">
+    <div className="font-poppins pb-10 w-full max-w-[1400px] mx-auto animate-in fade-in duration-500 text-left">
       
-      {/* 1. HEADER SECTION */}
       <div className="flex items-center justify-between px-2 mb-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 shrink-0">
@@ -152,9 +168,8 @@ export default function EditUsahaPage() {
         </Link>
       </div>
 
-      {/* 2. CARD FORM */}
       <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
-        <div className="bg-slate-900 px-8 py-6 flex items-center justify-between relative overflow-hidden">
+        <div className="bg-slate-900 px-8 py-6 flex items-center justify-between relative overflow-hidden text-left">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg"><Building2 size={20} /></div>
@@ -168,12 +183,18 @@ export default function EditUsahaPage() {
         <div className="p-4 md:p-8 bg-slate-50/30">
           <div className="w-full bg-white p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
             <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                 
-                {/* Inputs Row 1 */}
+                {/* Nama Usaha */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><Building2 size={12} className="text-blue-600" /> Nama Usaha *</label>
                   <input type="text" name="nama" value={formData.nama} onChange={handleChange} required className={inputClassName} />
+                </div>
+
+                {/* Nama Pemilik - BARU */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><User size={12} className="text-blue-600" /> Nama Pemilik *</label>
+                  <input type="text" name="namaPemilik" value={formData.namaPemilik} onChange={handleChange} required className={inputClassName} placeholder="Nama Lengkap Pemilik" />
                 </div>
 
                 <div className="space-y-2">
@@ -197,7 +218,6 @@ export default function EditUsahaPage() {
                   </div>
                 </div>
 
-                {/* Inputs Row 2 */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><Calendar size={12} className="text-blue-600" /> Tahun Berdiri</label>
                   <input type="number" name="tahunBerdiri" value={formData.tahunBerdiri} onChange={handleChange} className={inputClassName} />
@@ -213,7 +233,6 @@ export default function EditUsahaPage() {
                   <input type="text" name="desa" value={formData.desa} onChange={handleChange} required className={inputClassName} />
                 </div>
 
-                {/* Inputs Row 3 */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><Mail size={12} className="text-blue-600" /> Email *</label>
                   <input type="email" name="email" value={formData.email} onChange={handleChange} required className={inputClassName} />
@@ -229,7 +248,6 @@ export default function EditUsahaPage() {
                   <input type="number" name="investasi" value={formData.investasi} onChange={handleChange} className={inputClassName} />
                 </div>
 
-                {/* KOORDINAT SATU INPUT (MATCH FORM TAMBAH) */}
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                     <Globe size={12} className="text-blue-600" /> Koordinat Lokasi (Maps) *
@@ -243,9 +261,6 @@ export default function EditUsahaPage() {
                     className={`${inputClassName} ${coordinateError ? 'border-red-500' : 'border-slate-200'}`} 
                   />
                   {coordinateError && <p className="text-[10px] font-bold text-red-500 uppercase ml-2">{coordinateError}</p>}
-                  {!coordinateError && formData.latitude && (
-                    <p className="text-[10px] font-bold text-green-600 uppercase ml-2 italic">✓ Terbaca: {formData.latitude}, {formData.longitude}</p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -260,7 +275,6 @@ export default function EditUsahaPage() {
                   </div>
                 </div>
 
-                {/* Deskripsi */}
                 <div className="lg:col-span-3 space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><FileText size={12} className="text-blue-600" /> Deskripsi Usaha</label>
                   <textarea name="deskripsi" value={formData.deskripsi} onChange={handleChange} rows={3} className={`${inputClassName} resize-none`} />
@@ -268,7 +282,7 @@ export default function EditUsahaPage() {
               </div>
 
               <div className="flex justify-end pt-6 border-t border-slate-100">
-                <Button type="submit" disabled={saving || !!coordinateError} className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3">
+                <Button type="submit" disabled={saving || !!coordinateError} className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3 active:scale-95">
                   {saving ? <><Loader2 className="animate-spin" size={18} /> Menyimpan...</> : <><Save size={18} /> Simpan Perubahan</>}
                 </Button>
               </div>

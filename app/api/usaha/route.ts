@@ -44,9 +44,18 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
+    const requiredFields = [
+      'nama', 
+      'namaPemilik', 
+      'sektor', 
+      'latitude', 
+      'longitude', 
+      'kecamatan', 
+      'desa', 
+      'nomerTelp', 
+      'email'
+    ]
 
-    // Validate required fields
-    const requiredFields = ['nama', 'sektor', 'latitude', 'longitude', 'kecamatan', 'desa', 'nomerTelp', 'email']
     for (const field of requiredFields) {
       if (!body[field]) {
         return NextResponse.json(
@@ -59,6 +68,7 @@ export async function POST(req: NextRequest) {
     const usaha = await prisma.usaha.create({
       data: {
         nama: body.nama,
+        namaPemilik: body.namaPemilik, 
         sektor: body.sektor,
         status: body.status || 'Aktif',
         latitude: parseFloat(body.latitude),

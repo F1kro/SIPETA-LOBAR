@@ -15,12 +15,14 @@ import {
   Briefcase, 
   Phone, 
   Mail,
-  MapPin
+  MapPin,
+  User
 } from "lucide-react"
 
 interface Usaha {
   id: string
   nama: string
+  namaPemilik: string // Field Baru Sesuai Schema
   sektor: string
   status: string
   kecamatan: string
@@ -63,8 +65,10 @@ export default function UsahaListPage() {
     }
   }
 
+  // Filter Search diperluas untuk Nama Pemilik
   const filteredUsahas = usahas.filter((u) => 
     u.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.namaPemilik.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.sektor.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.kecamatan.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -96,7 +100,7 @@ export default function UsahaListPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <input 
               type="text"
-              placeholder="CARI NAMA / SEKTOR..."
+              placeholder="CARI NAMA / PEMILIK..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value)
@@ -113,7 +117,7 @@ export default function UsahaListPage() {
         </div>
       </div>
 
-      {/* Table Section - FIXED WHITE SPACE */}
+      {/* Table Section */}
       <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
         <div className="overflow-x-auto">
           {loading ? (
@@ -131,18 +135,21 @@ export default function UsahaListPage() {
           ) : (
             <div className="flex flex-col">
               <table className="w-full border-separate border-spacing-0">
-                <thead className="bg-slate-900 overflow-hidden">
+                <thead className="bg-slate-900 overflow-hidden text-left">
                   <tr>
-                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] first:rounded-tl-[2.5rem]">
+                    <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] first:rounded-tl-[2.5rem]">
                       Informasi Usaha
                     </th>
-                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                    <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                      Nama Pemilik
+                    </th>
+                    <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                       Sektor & Status
                     </th>
-                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                    <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                       Wilayah
                     </th>
-                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                    <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                       Detail Kontak
                     </th>
                     <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] last:rounded-tr-[2.5rem]">
@@ -150,7 +157,7 @@ export default function UsahaListPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-slate-50 text-left">
                   {currentItems.map((usaha) => (
                     <tr key={usaha.id} className="hover:bg-blue-50/30 transition-colors group">
                       <td className="px-8 py-5">
@@ -160,6 +167,17 @@ export default function UsahaListPage() {
                           </span>
                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-1 italic">
                             ID: {usaha.id.substring(0, 8)}...
+                          </span>
+                        </div>
+                      </td>
+                      {/* KOLOM BARU: NAMA PEMILIK */}
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                            <User size={14} />
+                          </div>
+                          <span className="text-[11px] font-black text-slate-700 uppercase">
+                            {usaha.namaPemilik || "N/A"}
                           </span>
                         </div>
                       </td>
@@ -223,7 +241,7 @@ export default function UsahaListPage() {
 
               {/* NAVIGASI PAGINATION */}
               <div className="flex flex-col sm:flex-row items-center justify-between px-8 py-6 bg-slate-50 border-t border-slate-100">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 sm:mb-0">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 sm:mb-0 text-left">
                   Menampilkan <span className="text-slate-900">{indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredUsahas.length)}</span> Dari <span className="text-slate-900">{filteredUsahas.length}</span> Database
                 </div>
                 
@@ -244,7 +262,7 @@ export default function UsahaListPage() {
                         variant={currentPage === page ? "default" : "outline"}
                         className={`h-10 w-10 rounded-xl font-black text-xs transition-all p-0 ${
                           currentPage === page 
-                            ? "bg-blue-600 shadow-lg shadow-blue-200 border-blue-600" 
+                            ? "bg-blue-600 shadow-lg shadow-blue-200 border-blue-600 text-white" 
                             : "bg-white border-slate-200 text-slate-400 hover:text-blue-600"
                         }`}
                         onClick={() => setCurrentPage(page)}
