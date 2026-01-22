@@ -2,13 +2,23 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MapPin, Map, Users, Home, X, ArrowLeft, LayoutDashboard } from 'lucide-react'
+import { 
+  MapPin, 
+  Map, 
+  Users, 
+  Home, 
+  X, 
+  ArrowLeft, 
+  LayoutDashboard, 
+  FileText 
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const menuItems = [
   { href: '/admin', icon: Home, label: 'Dashboard' },
   { href: '/admin/usaha', icon: MapPin, label: 'Lokasi Usaha' },
   { href: '/admin/wilayah', icon: Map, label: 'Wilayah' },
+  { href: '/admin/laporan', icon: FileText, label: 'Laporan Excel' }, // Menu Baru
   { href: '/admin/users', icon: Users, label: 'Users/Admin' },
 ]
 

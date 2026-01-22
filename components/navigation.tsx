@@ -21,10 +21,21 @@ export function Navigation() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Fungsi pembantu untuk cek status aktif
+  // Fungsi pembantu untuk cek status aktif yang sudah diperbaiki
   const isActive = (href: string) => {
-    // Menu aktif jika path cocok, ATAU jika ini menu Konsultasi dan kita sedang di Hubungi Kami
-    return pathname === href || (href === "/konsultasi" && pathname === "/hubungi-kami")
+    // 1. Jika menu adalah Beranda, path harus persis "/"
+    if (href === "/") {
+      return pathname === "/"
+    }
+
+    // 2. Cek apakah pathname saat ini dimulai dengan href menu
+    // Ini menangani detail usaha (misal: /peta-usaha/[id]) agar menu utamanya tetap aktif
+    const isSubPathActive = pathname.startsWith(href)
+
+    // 3. Logika khusus untuk konsultasi/hubungi kami
+    const isKonsultasiSpecial = href === "/konsultasi" && pathname === "/hubungi-kami"
+
+    return isSubPathActive || isKonsultasiSpecial
   }
 
   return (

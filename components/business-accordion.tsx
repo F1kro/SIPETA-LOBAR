@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, ReactNode } from "react"
 import { Card } from "@/components/ui/card"
-import { ChevronDown, CheckCircle2, AlertCircle } from "lucide-react"
+import { ChevronDown, CheckCircle2, AlertCircle, Wallet, Clock } from "lucide-react"
 
 interface BusinessItem {
   category: string
-  description: string
+  description: ReactNode
+  biaya?: string
+  waktu?: string
 }
 
 interface BusinessAccordionProps {
@@ -14,7 +16,6 @@ interface BusinessAccordionProps {
   type: "suitable" | "study"
 }
 
-// Business detail database
 const BUSINESS_DETAILS: Record<
   string,
   {
@@ -25,404 +26,116 @@ const BUSINESS_DETAILS: Record<
   }
 > = {
   "Resort & Akomodasi Wisata": {
-    requirements: [
-      "AMDAL (Analisis Mengenai Dampak Lingkungan) untuk skala tertentu",
-      "Izin Mendirikan Bangunan (IMB) dari Dinas PUPR",
-      "Sertifikat tanah dan bukti kepemilikan/hak",
-      "NPWP dan KTP pemiliki",
-      "Rencana arsitektur dan tata letak bangunan",
-      "Surat rekomendasi dari pemerintah desa/kelurahan",
-      "Izin lingkungan hidup atau SPPL",
-    ],
-    considerations: [
-      "Pastikan lahan memenuhi standar minimum untuk resort bintang 3-5",
-      "Pertimbangkan aksesibilitas dan infrastruktur listrik/air",
-      "Penuhi standar konservasi laut dan perlindungan ekosistem terumbu karang",
-      "Libatkan masyarakat lokal dalam perencanaan dan operasional",
-      "Siapkan sistem pengelolaan limbah yang ramah lingkungan",
-      "Pertimbangkan dampak musim dan cuaca ekstrem",
-    ],
-    estimatedCost: "Rp 500 juta - Rp 2 miliar (untuk persiapan dokumen)",
-    estimatedTimeframe: "3-6 bulan untuk pengurusan perizinan lengkap",
+    requirements: ["AMDAL untuk skala tertentu", "Izin Mendirikan Bangunan (IMB)", "Sertifikat tanah", "NPWP dan KTP pemilik", "Izin lingkungan hidup atau SPPL"],
+    considerations: ["Lahan memenuhi standar resort", "Aksesibilitas infrastruktur", "Sistem pengelolaan limbah"],
+    estimatedCost: "Rp 500 juta - Rp 2 miliar",
+    estimatedTimeframe: "3-6 bulan",
   },
   "Diving Center & Olahraga Air": {
-    requirements: [
-      "Izin operasional dari Dinas Pariwisata",
-      "Sertifikat keselamatan dari badan internasional (PADI, SSI untuk diving)",
-      "Surat izin dari Dinas Kelautan untuk penggunaan area laut",
-      "Asuransi pertanggungjawaban publik",
-      "NPWP dan dokumen identitas pemilik",
-      "Rencana operasional dan standar keselamatan",
-      "Surat persetujuan dari pemerintah desa/kelurahan",
-    ],
-    considerations: [
-      "Pastikan semua instruktur memiliki sertifikasi internasional yang valid",
-      "Lakukan briefing keselamatan komprehensif sebelum aktivitas",
-      "Sediakan peralatan keselamatan berkualitas tinggi dan dirawat dengan baik",
-      "Jaga kondisi spot diving melalui praktik pariwisata berkelanjutan",
-      "Patuhi aturan konservasi laut dan tidak mengganggu ekosistem",
-      "Punya rencana evakuasi medis darurat yang jelas",
-    ],
-    estimatedCost: "Rp 100 juta - Rp 500 juta (tergantung skala)",
-    estimatedTimeframe: "2-4 bulan untuk perizinan operasional",
+    requirements: ["Izin operasional Pariwisata", "Sertifikat keselamatan PADI/SSI", "Izin Dinas Kelautan", "Asuransi publik"],
+    considerations: ["Instruktur bersertifikasi", "Konservasi laut", "Rencana evakuasi medis"],
+    estimatedCost: "Rp 100 juta - Rp 500 juta",
+    estimatedTimeframe: "2-4 bulan",
   },
   "Restoran & Kafe Tepi Pantai": {
-    requirements: [
-      "Izin Mendirikan Bangunan (IMB)",
-      "Sertifikat Usaha Mikro, Kecil, Menengah (UMKM) atau izin usaha lainnya",
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Tanda Daftar Perusahaan (TDP)",
-      "Izin dari Dinas Kesehatan untuk restoran/kafe",
-      "Bukti kepemilikan atau hak atas lahan",
-      "NPWP dan KTP pemilik",
-      "Surat izin dari kelurahan/desa",
-    ],
-    considerations: [
-      "Perhatikan tren pasar dan preferensi wisatawan internasional",
-      "Siapkan sistem pengelolaan sampah dan limbah cair yang baik",
-      "Terapkan standar kebersihan dan keamanan pangan tinggi",
-      "Perhitungkan fluktuasi musim dalam perencanaan operasional",
-      "Miliki izin khusus jika menjual alkohol",
-      "Pastikan air bersih tersedia untuk operasional",
-    ],
-    estimatedCost: "Rp 50 juta - Rp 300 juta (tergantung konsep)",
-    estimatedTimeframe: "1-3 bulan untuk perizinan dasar",
+    requirements: ["IMB", "Sertifikat UMKM", "SIUP & TDP", "Izin Dinas Kesehatan"],
+    considerations: ["Pengelolaan sampah & limbah cair", "Standar kebersihan pangan", "Izin alkohol jika ada"],
+    estimatedCost: "Rp 50 juta - Rp 300 juta",
+    estimatedTimeframe: "1-3 bulan",
   },
   "Spa & Wellness Center": {
-    requirements: [
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Izin Mendirikan Bangunan (IMB)",
-      "Sertifikat kesehatan dari Dinas Kesehatan",
-      "Izin lingkungan (SPPL atau AMDAL jika diperlukan)",
-      "Bukti kepemilikan/hak atas lahan",
-      "NPWP dan KTP pemilik",
-      "Standar operasional dan protokol kesehatan",
-      "Surat persetujuan pemerintah desa/kelurahan",
-    ],
-    considerations: [
-      "Pastikan semua terapis memiliki sertifikat kesehatan dari dinas terkait",
-      "Terapkan protokol kebersihan dan sterilisasi yang ketat",
-      "Gunakan produk kecantikan dan wellness yang aman dan terdaftar",
-      "Miliki prosedur penanganan data pribadi dan privasi klien",
-      "Persiapkan sistem manajemen limbah khususnya dari perawatan kesehatan",
-      "Konsultasikan jenis treatment yang sesuai dengan regulasi lokal",
-    ],
-    estimatedCost: "Rp 100 juta - Rp 500 juta (tergantung fasilitas)",
-    estimatedTimeframe: "2-3 bulan untuk perizinan lengkap",
+    requirements: ["SIUP", "IMB", "Sertifikat kesehatan", "Izin lingkungan"],
+    considerations: ["Terapis bersertifikat", "Protokol sterilisasi", "Manajemen limbah medis"],
+    estimatedCost: "Rp 100 juta - Rp 500 juta",
+    estimatedTimeframe: "2-3 bulan",
   },
   "Penyewaan Perahu & Transportasi": {
-    requirements: [
-      "Izin operasional dari Dinas Kelautan dan Perikanan",
-      "Sertifikat kapal/perahu dari Badan Klasifikasi Indonesia",
-      "Asuransi pertanggungjawaban publik",
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "NPWP dan dokumen identitas pemilik",
-      "Rencana operasional dan standar keselamatan",
-      "Surat persetujuan dari pemerintah desa/kelurahan",
-      "Dokumen pemeliharaan kapal yang teratur",
-    ],
-    considerations: [
-      "Pastikan semua kapal/perahu layak operasi dan rutin dipelihara",
-      "Sediakan peralatan keselamatan lengkap (life jacket, lifeboat, dll)",
-      "Miliki crew yang terlatih dan bersertifikat",
-      "Lakukan pemeriksaan kapal berkala sesuai standar internasional",
-      "Perhatikan kondisi cuaca dan musim dalam operasional",
-      "Implementasikan protokol keselamatan yang ketat untuk penumpang",
-    ],
-    estimatedCost: "Rp 200 juta - Rp 1 miliar (tergantung jumlah dan jenis kapal)",
-    estimatedTimeframe: "2-4 bulan untuk perizinan awal",
+    requirements: ["Izin Dinas Kelautan", "Sertifikat kapal BKI", "Asuransi publik", "SIUP"],
+    considerations: ["Kelayakan operasi kapal", "Alat keselamatan lengkap", "Crew terlatih"],
+    estimatedCost: "Rp 200 juta - Rp 1 miliar",
+    estimatedTimeframe: "2-4 bulan",
   },
   "Pariwisata dan perhotelan": {
-    requirements: [
-      "AMDAL atau SPPL (Surat Pernyataan Pengelolaan Lingkungan)",
-      "Izin Mendirikan Bangunan (IMB)",
-      "Sertifikat kepemilikan tanah",
-      "NPWP dan KTP pemilik/pengurus",
-      "Rencana arsitektur dan master plan",
-      "Rekomendasi dari pemerintah desa/kelurahan",
-      "Izin dari Dinas Pariwisata",
-    ],
-    considerations: [
-      "Koordinasi dengan Dinas Pariwisata untuk pengembangan yang sesuai",
-      "Pertimbangkan dampak terhadap komunitas lokal",
-      "Siapkan rencana manajemen lingkungan yang komprehensif",
-      "Jaga keberlanjutan dan konservasi area wisata",
-      "Libatkan masyarakat dalam manfaat ekonomi pariwisata",
-      "Pastikan fasilitas memenuhi standar pariwisata internasional",
-    ],
+    requirements: ["AMDAL atau SPPL", "IMB", "Sertifikat tanah", "Izin Dinas Pariwisata"],
+    considerations: ["Koordinasi instansi terkait", "Dampak komunitas lokal", "Keberlanjutan area"],
     estimatedCost: "Rp 500 juta - Rp 3 miliar",
     estimatedTimeframe: "3-6 bulan",
   },
   "Rental perlengkapan wisata": {
-    requirements: [
-      "Izin Usaha dari Dinas Kelautan/Pariwisata",
-      "Sertifikat peralatan dari produsen/verifikasi kelayakan",
-      "Asuransi perlengkapan dan pertanggungjawaban publik",
-      "NPWP dan KTP pemilik",
-      "Bukti kepemilikan/sewa lokasi",
-      "Rencana operasional dan standar keselamatan",
-      "Izin dari desa/kelurahan",
-    ],
-    considerations: [
-      "Pastikan semua perlengkapan dalam kondisi baik dan aman",
-      "Sediakan asuransi untuk pelanggan",
-      "Lakukan pemeriksaan rutin dan perawatan berkala",
-      "Terapkan protokol keselamatan penggunaan peralatan",
-      "Miliki staf yang terlatih dalam penggunaan peralatan",
-      "Dokumentasikan kondisi dan riwayat peralatan",
-    ],
+    requirements: ["Izin Usaha", "Sertifikat peralatan", "Asuransi publik"],
+    considerations: ["Kondisi perlengkapan baik", "Protokol keselamatan", "Staff terlatih"],
     estimatedCost: "Rp 50 juta - Rp 200 juta",
     estimatedTimeframe: "1-2 bulan",
   },
   "Toko souvenir": {
-    requirements: [
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Izin Mendirikan Bangunan (IMB)",
-      "NPWP dan KTP pemilik",
-      "Sertifikat tanah atau bukti hak tempat usaha",
-      "Tanda Daftar Perusahaan (TDP) jika berbentuk CV/PT",
-      "Izin dari kelurahan/desa",
-      "Rekomendasi dari Dinas Pariwisata",
-    ],
-    considerations: [
-      "Pastikan produk lokal dan kreatifitas lokal terwakili",
-      "Bantu pengrajin lokal dalam pemasaran",
-      "Jaga kualitas dan autentisitas produk souvenir",
-      "Miliki sistem pembayaran yang memudahkan wisatawan",
-      "Pertimbangkan desain toko yang menarik bagi wisatawan",
-      "Dokumentasikan asal dan nilai produk lokal",
-    ],
+    requirements: ["SIUP", "IMB", "NPWP", "Izin desa/kelurahan"],
+    considerations: ["Produk lokal autentik", "Sistem pembayaran mudah", "Desain toko menarik"],
     estimatedCost: "Rp 30 juta - Rp 100 juta",
     estimatedTimeframe: "1-2 bulan",
   },
   "Jasa penyelam dan olahraga air": {
-    requirements: [
-      "Izin dari Dinas Kelautan dan Pariwisata",
-      "Sertifikasi internasional (PADI, SSI, ANDI, dll)",
-      "Sertifikat kesehatan dari dokter",
-      "Asuransi pertanggungjawaban (minimal Rp 1 miliar)",
-      "NPWP dan KTP pemilik",
-      "Rencana operasional dan protokol keselamatan",
-      "Surat izin dari pemerintah setempat",
-    ],
-    considerations: [
-      "Semua instruktur harus bersertifikat dan terupdate",
-      "Lakukan asuransi jiwa untuk setiap peserta aktivitas",
-      "Miliki standar keselamatan internasional",
-      "Briefing keselamatan komprehensif sebelum aktivitas",
-      "Equipment berkualitas tinggi dan rutin maintenance",
-      "Tim rescue dan first aid yang terlatih",
-    ],
+    requirements: ["Izin Kelautan & Pariwisata", "Sertifikasi PADI/SSI", "Asuransi"],
+    considerations: ["Maintenance alat rutin", "Tim rescue siap", "Briefing keselamatan"],
     estimatedCost: "Rp 100 juta - Rp 500 juta",
     estimatedTimeframe: "2-3 bulan",
   },
-  Agribisnis: {
-    requirements: [
-      "Sertifikat tanah/lahan produktif",
-      "NPWP dan KTP pemilik",
-      "Surat Rekomendasi dari Dinas Pertanian",
-      "Izin lingkungan jika skala besar",
-      "Rencana pengembangan pertanian",
-      "Rekomendasi dari pemerintah desa",
-      "Izin Usaha dari Dinas Perindustrian",
-    ],
-    considerations: [
-      "Jaga kelestarian lahan pertanian yang produktif",
-      "Terapkan praktik pertanian berkelanjutan",
-      "Koordinasi dengan petani lokal untuk peluang kolaborasi",
-      "Pertimbangkan sistem irigasi dan manajemen air",
-      "Diversifikasi jenis komoditas pertanian",
-      "Pilih bibit dan teknologi pertanian yang tepat",
-    ],
+  "Agribisnis": {
+    requirements: ["Sertifikat tanah", "Rekomendasi Dinas Pertanian", "Izin industri"],
+    considerations: ["Praktik berkelanjutan", "Sistem irigasi", "Teknologi pertanian tepat"],
     estimatedCost: "Rp 100 juta - Rp 500 juta",
     estimatedTimeframe: "2-3 bulan",
   },
   "Pertanian organik": {
-    requirements: [
-      "Sertifikat lahan organik (dari LSM sertifikasi)",
-      "Sertifikat tanah",
-      "NPWP dan KTP pemilik",
-      "Rekomendasi dari Dinas Pertanian",
-      "Rencana konversi ke pertanian organik",
-      "Izin lingkungan jika diperlukan",
-      "Rekomendasi dari pemerintah desa",
-    ],
-    considerations: [
-      "Proses sertifikasi organik membutuhkan waktu 2-3 tahun",
-      "Dokumentasi lengkap tentang metode pertanian",
-      "Tidak boleh menggunakan pestisida/pupuk sintetis",
-      "Manajemen kesuburan tanah yang alami",
-      "Edukasi petani tentang praktik organik",
-      "Pasar dan sertifikasi internasional yang diakui",
-    ],
+    requirements: ["Sertifikat lahan organik", "Rekomendasi Pertanian", "Izin lingkungan"],
+    considerations: ["Tanpa pestisida sintetis", "Manajemen kesuburan alami", "Edukasi petani"],
     estimatedCost: "Rp 50 juta - Rp 200 juta",
-    estimatedTimeframe: "2-3 tahun untuk sertifikasi penuh",
+    estimatedTimeframe: "2-3 tahun",
   },
   "Agro-wisata": {
-    requirements: [
-      "Izin dari Dinas Pertanian dan Dinas Pariwisata",
-      "AMDAL atau SPPL",
-      "Sertifikat tanah",
-      "IMB untuk fasilitas pendukung",
-      "NPWP dan KTP pemilik",
-      "Rencana agro-wisata dan infrastruktur",
-      "Rekomendasi desa/kelurahan",
-    ],
-    considerations: [
-      "Edukasi wisatawan tentang proses pertanian",
-      "Fasilitas yang aman dan nyaman untuk pengunjung",
-      "Program interaktif yang edukatif dan menyenangkan",
-      "Manajemen limbah dari aktivitas wisata",
-      "Libatkan petani lokal sebagai mitra",
-      "Jaga keberlanjutan sumber daya alam",
-    ],
+    requirements: ["Izin Pertanian & Pariwisata", "AMDAL/SPPL", "IMB fasilitas"],
+    considerations: ["Edukasi proses pertanian", "Fasilitas pengunjung nyaman", "Manajemen limbah"],
     estimatedCost: "Rp 200 juta - Rp 1 miliar",
     estimatedTimeframe: "3-4 bulan",
   },
   "Kerajinan tradisional": {
-    requirements: [
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Sertifikat legalitas produk (jika diperlukan)",
-      "NPWP dan KTP pemilik",
-      "Bukti kepemilikan/sewa tempat usaha",
-      "Rencana operasional",
-      "Izin dari kelurahan/desa",
-      "Sertifikat dari Dinas Perindustrian (opsional)",
-    ],
-    considerations: [
-      "Jaga autentisitas dan tradisi pembuatan kerajinan",
-      "Dokumentasi teknik dan warisan budaya",
-      "Pelatihan dan transfer pengetahuan ke generasi muda",
-      "Kualitas bahan baku dan hasil akhir",
-      "Sertifikasi dan penghargaan kerajinan tradisional",
-      "Strategi pemasaran yang tepat untuk pasar lokal/internasional",
-    ],
+    requirements: ["SIUP", "Sertifikat legalitas", "Izin desa/kelurahan"],
+    considerations: ["Autentisitas tradisi", "Pelatihan generasi muda", "Strategi pemasaran"],
     estimatedCost: "Rp 20 juta - Rp 100 juta",
     estimatedTimeframe: "1-2 bulan",
   },
   "Peternakan organik": {
-    requirements: [
-      "Sertifikat lahan untuk peternakan",
-      "Sertifikat sumber pakan organik",
-      "NPWP dan KTP pemilik",
-      "Rencana peternakan organik",
-      "Izin dari Dinas Peternakan",
-      "Rekomendasi desa/kelurahan",
-      "Sertifikat kesehatan hewan",
-    ],
-    considerations: [
-      "Manajemen kesehatan hewan tanpa antibiotik sintetis",
-      "Pakan organik bersertifikat",
-      "Sistem pemberian minum dan pakan yang higienis",
-      "Manajemen limbah peternakan yang ramah lingkungan",
-      "Pemeliharaan standar kesejahteraan hewan",
-      "Pemasaran produk organik dengan sertifikasi",
-    ],
+    requirements: ["Sertifikat lahan", "Izin Dinas Peternakan", "Sertifikat kesehatan hewan"],
+    considerations: ["Pakan organik", "Kesejahteraan hewan", "Manajemen limbah"],
     estimatedCost: "Rp 100 juta - Rp 500 juta",
     estimatedTimeframe: "2-3 bulan",
   },
-  Ekowisata: {
-    requirements: [
-      "Izin dari Dinas Lingkungan dan Dinas Pariwisata",
-      "AMDAL atau SPPL komprehensif",
-      "Sertifikat tanah/kawasan",
-      "IMB untuk fasilitas pendukung",
-      "Rencana pengelolaan lingkungan",
-      "NPWP dan KTP pemilik",
-      "Rekomendasi desa/kelurahan dan/atau camat",
-    ],
-    considerations: [
-      "Perlindungan ekosistem adalah prioritas utama",
-      "Batasi jumlah pengunjung untuk menjaga kelestarian",
-      "Edukasi lingkungan untuk setiap pengunjung",
-      "Infrastruktur yang minim invasif terhadap alam",
-      "Keterlibatan komunitas lokal dalam manajemen",
-      "Sertifikasi ekowisata internasional yang diakui",
-    ],
+  "Ekowisata": {
+    requirements: ["Izin Lingkungan & Pariwisata", "AMDAL komprehensif", "IMB"],
+    considerations: ["Perlindungan ekosistem", "Edukasi lingkungan", "Komunitas lokal"],
     estimatedCost: "Rp 300 juta - Rp 2 miliar",
     estimatedTimeframe: "3-5 bulan",
   },
   "Cottage dan penginapan": {
-    requirements: [
-      "Izin Mendirikan Bangunan (IMB)",
-      "Sertifikat tanah/kepemilikan lahan",
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "NPWP dan KTP pemilik",
-      "Rencana arsitektur dan tata letak",
-      "Sertifikat Usaha dari Dinas Pariwisata",
-      "Rekomendasi desa/kelurahan",
-    ],
-    considerations: [
-      "Standar kebersihan dan fasilitas kamar yang baik",
-      "Sistem keamanan dan keselamatan pengguna",
-      "Manajemen limbah dan air yang ramah lingkungan",
-      "Sumber daya air bersih yang cukup",
-      "Staf terlatih dalam hospitality",
-      "Komunikasi dengan wisatawan internasional jika perlu",
-    ],
+    requirements: ["IMB", "SIUP", "Sertifikat Usaha Pariwisata", "Izin desa"],
+    considerations: ["Standar hospitality", "Keamanan pengguna", "Sumber air bersih"],
     estimatedCost: "Rp 300 juta - Rp 1 miliar",
     estimatedTimeframe: "2-4 bulan",
   },
   "Petualangan alam": {
-    requirements: [
-      "Izin dari Dinas Pariwisata dan Lingkungan",
-      "Sertifikasi keselamatan dari badan terkait",
-      "NPWP dan KTP pemilik",
-      "Asuransi pertanggungjawaban publik",
-      "Rencana operasional dan protokol keselamatan",
-      "Sertifikat instruktur petualangan",
-      "Rekomendasi desa/kelurahan",
-    ],
-    considerations: [
-      "Standar keselamatan petualangan internasional",
-      "Equipment dan gear berkualitas tinggi dan terawat",
-      "Instruktur bersertifikat dan berpengalaman",
-      "Evaluasi risiko untuk setiap aktivitas",
-      "Asuransi untuk setiap peserta",
-      "Tim rescue dan first aid siap",
-    ],
+    requirements: ["Izin Pariwisata", "Sertifikasi keselamatan", "Asuransi"],
+    considerations: ["Gear berkualitas", "Evaluasi risiko", "Tim rescue terlatih"],
     estimatedCost: "Rp 100 juta - Rp 500 juta",
     estimatedTimeframe: "2-3 bulan",
   },
   "Kafe dan rumah makan": {
-    requirements: [
-      "Izin Mendirikan Bangunan (IMB)",
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Sertifikat Usaha Restoran dari Dinas Kesehatan",
-      "NPWP dan KTP pemilik",
-      "Bukti kepemilikan/sewa tempat",
-      "Izin dari kelurahan/desa",
-      "Tanda Daftar Perusahaan (TDP)",
-    ],
-    considerations: [
-      "Standar kebersihan dapur dan peralatan masak",
-      "Sumber air bersih dan sistem pembuangan limbah",
-      "Izin khusus untuk menjual alkohol jika ada",
-      "Pelatihan food handling untuk semua staff",
-      "Dokumentasi menu dan bahan makanan",
-      "Kenyamanan dan estetika tempat makan",
-    ],
+    requirements: ["IMB", "SIUP", "Sertifikat Laik Sehat", "Izin lingkungan"],
+    considerations: ["Kebersihan dapur", "Pembuangan limbah", "Kenyamanan estetika"],
     estimatedCost: "Rp 50 juta - Rp 300 juta",
     estimatedTimeframe: "1-3 bulan",
   },
   "Craft dan kerajinan lokal": {
-    requirements: [
-      "Surat Izin Usaha Perdagangan (SIUP)",
-      "Sertifikat produk jika diperlukan",
-      "NPWP dan KTP pemilik",
-      "Bukti kepemilikan/sewa tempat usaha",
-      "Rencana produksi dan desain",
-      "Izin dari kelurahan/desa",
-      "Rekomendasi Dinas Perindustrian (opsional)",
-    ],
-    considerations: [
-      "Jaga keunikan dan karakter lokal produk",
-      "Kualitas bahan dan hasil kerajinan",
-      "Sertifikasi atau penghargaan kerajinan",
-      "Strategi pemasaran lokal dan wisatawan",
-      "Pelatihan keterampilan untuk pengrajin",
-      "Dokumentasi proses dan cerita produk",
-    ],
+    requirements: ["SIUP", "NPWP", "Izin desa/kelurahan", "Sertifikat produk"],
+    considerations: ["Karakter lokal unik", "Pelatihan pengrajin", "Dokumentasikan cerita produk"],
     estimatedCost: "Rp 20 juta - Rp 100 juta",
     estimatedTimeframe: "1-2 bulan",
   },
@@ -435,8 +148,6 @@ export function BusinessAccordion({ items, type }: BusinessAccordionProps) {
     setExpandedIndex(expandedIndex === index ? null : index)
   }
 
-  const icon = type === "suitable" ? CheckCircle2 : AlertCircle
-  const iconBgColor = type === "suitable" ? "bg-green-500" : "bg-blue-500"
   const cardBgColor = type === "suitable" ? "border-green-200 bg-green-50/50" : "border-blue-200 bg-blue-50/50"
 
   return (
@@ -444,69 +155,83 @@ export function BusinessAccordion({ items, type }: BusinessAccordionProps) {
       {items.map((item, idx) => {
         const isExpanded = expandedIndex === idx
         const details = BUSINESS_DETAILS[item.category] || {
-          requirements: ["Informasi detail tidak tersedia"],
-          considerations: ["Silakan konsultasi dengan DPMPTSP"],
+          requirements: ["Informasi detail tidak tersedia untuk kategori ini"],
+          considerations: ["Silakan konsultasi lebih lanjut dengan dinas terkait"],
           estimatedCost: "Bervariasi",
           estimatedTimeframe: "Bervariasi",
         }
 
         return (
-          <Card key={idx} className={`border ${cardBgColor} overflow-hidden cursor-pointer transition-all`}>
-            {/* Header - Always visible */}
-            <div onClick={() => toggleExpanded(idx)} className="p-4 hover:bg-black/5 transition-colors">
+          <Card key={idx} className={`border ${cardBgColor} overflow-hidden transition-all shadow-sm`}>
+            <div onClick={() => toggleExpanded(idx)} className="p-4 hover:bg-black/5 cursor-pointer">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h4 className="text-base font-semibold text-foreground mb-1">{item.category}</h4>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                <div className="flex-1 text-left">
+                  <h4 className="text-base font-black text-slate-900 uppercase tracking-tight mb-1">
+                    {item.category}
+                  </h4>
+                  <div className="text-sm text-slate-600 leading-relaxed font-medium">
+                    {item.description}
+                  </div>
                 </div>
-                <div className={`flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                <div className={`mt-1 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}>
+                  <ChevronDown className="w-5 h-5 text-slate-400" />
                 </div>
               </div>
             </div>
 
-            {/* Expandable Content */}
             {isExpanded && (
-              <div className="border-t border-current/10 p-6 bg-white/50 space-y-6">
-                {/* Requirements */}
-                <div>
-                  <h5 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <span className="text-sm font-medium">Syarat Pembuatan Izin</span>
+              <div className="border-t border-slate-200 p-6 bg-white space-y-7 animate-in fade-in slide-in-from-top-1 duration-300">
+                <div className="text-left">
+                  <h5 className="font-black text-slate-900 text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" /> Syarat Pembuatan Izin
                   </h5>
-                  <div className="space-y-2 ml-2">
-                    {details.requirements.map((req, idx) => (
-                      <div key={idx} className="flex gap-3">
-                        <span className="text-primary font-semibold flex-shrink-0 mt-0.5">✓</span>
-                        <p className="text-sm text-foreground leading-relaxed">{req}</p>
+                  <div className="space-y-3 ml-2">
+                    {details.requirements.map((req, rIdx) => (
+                      <div key={rIdx} className="flex gap-3">
+                        <span className="text-green-500 font-black flex-shrink-0 text-xs">✓</span>
+                        <span className="text-sm text-slate-700 leading-relaxed font-bold">{req}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Considerations */}
-                <div>
-                  <h5 className="font-semibold text-foreground mb-3">Hal-hal yang Perlu Diperhatikan</h5>
-                  <div className="space-y-2 ml-2">
-                    {details.considerations.map((item, idx) => (
-                      <div key={idx} className="flex gap-3">
-                        <span className="text-amber-600 font-bold flex-shrink-0 mt-0.5">•</span>
-                        <p className="text-sm text-foreground leading-relaxed">{item}</p>
+                <div className="text-left border-t border-slate-100 pt-6">
+                  <h5 className="font-black text-slate-900 text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600" /> Hal yang Perlu Diperhatikan
+                  </h5>
+                  <div className="space-y-3 ml-2">
+                    {details.considerations.map((c, cIdx) => (
+                      <div key={cIdx} className="flex gap-3">
+                        <span className="text-amber-600 font-black flex-shrink-0 text-xs">•</span>
+                        <span className="text-sm text-slate-700 leading-relaxed font-bold">{c}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Cost & Timeline */}
-                <div className="grid grid-cols-2 gap-4 bg-white rounded-lg p-4 border border-current/10">
-                  <div>
-                    <p className="text-xs font-semibold text-muted-foreground mb-1">Estimasi Biaya</p>
-                    <p className="text-sm font-semibold text-foreground">{details.estimatedCost}</p>
+                {/* MODIFIKASI: Hanya muncul jika tipe adalah "suitable" (Usaha Prioritas) */}
+                {type === "suitable" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="p-3 bg-green-100 rounded-xl">
+                        <Wallet className="w-5 h-5 text-green-700" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 leading-none mb-1.5">Estimasi Biaya</p>
+                        <p className="text-sm font-black text-slate-900">{item.biaya || details.estimatedCost}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-left border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6">
+                      <div className="p-3 bg-blue-100 rounded-xl">
+                        <Clock className="w-5 h-5 text-blue-700" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 leading-none mb-1.5">Estimasi Waktu</p>
+                        <p className="text-sm font-black text-slate-900">{item.waktu || details.estimatedTimeframe}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-muted-foreground mb-1">Estimasi Waktu</p>
-                    <p className="text-sm font-semibold text-foreground">{details.estimatedTimeframe}</p>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </Card>
