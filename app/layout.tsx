@@ -6,13 +6,14 @@ import "./globals.css"
 import { Poppins } from 'next/font/google'
 import { Footer } from "@/components/footer"
 import { Toaster } from "sonner"
+import type { Metadata } from "next";
 
 
 // KONFIGURASI FONT ASLI KAMU - TIDAK DIUBAH
-const poppins = Poppins({ 
-  subsets: ['latin'], 
+const poppins = Poppins({
+  subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-poppins' 
+  variable: '--font-poppins'
 })
 
 export default function RootLayout({
@@ -23,21 +24,8 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning className={poppins.variable}>
       <head>
-        {/* Google Translate Init */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                  pageLanguage: 'id',
-                  includedLanguages: 'id,en',
-                  autoDisplay: false
-                }, 'google_translate_element');
-              }
-            `,
-          }}
-        />
-        {/* <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" /> */}
+        {/* Tag Meta Verifikasi Google Search Console */}
+        <meta name="google-site-verification" content="0mDp3t5GQ4oUVUZwu5v71wNY0ZEFe3qNA4eaJtYCbBc" />
         
         <style dangerouslySetInnerHTML={{ __html: `
           /* Sembunyikan Widget Google */
@@ -45,15 +33,15 @@ export default function RootLayout({
           body { top: 0px !important; }
           .goog-te-menu-value { display: none !important; }
           #google_translate_element { display: none; }
-          
+         
           /* PAKSA PAKAI POPPINS DI SEMUA ELEMEN */
           html, body, * {
             font-family: var(--font-poppins), sans-serif !important;
           }
         `}} />
       </head>
-      <body 
-        className="antialiased" 
+      <body
+        className="antialiased"
         suppressHydrationWarning
         style={{ marginTop: 0, paddingTop: 0 }}
       >
@@ -61,7 +49,6 @@ export default function RootLayout({
         <Analytics />
         <Footer />
         <Toaster/>
-        <div id="google_translate_element"></div>
       </body>
     </html>
   )
