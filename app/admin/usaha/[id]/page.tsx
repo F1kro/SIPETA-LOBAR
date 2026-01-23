@@ -11,6 +11,7 @@ import {
   Image as ImageIcon, FileText, ChevronDown, Edit3, User 
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 const SECTORS = ['Pariwisata', 'Pertanian', 'Perikanan', 'Peternakan', 'Perdagangan', 'Industri', 'Jasa', 'Pendidikan', 'Kesehatan', 'Lainnya']
 const STATUS_OPTIONS = ['aktif', 'nonaktif']
@@ -24,7 +25,7 @@ export default function EditUsahaPage() {
   
   const [formData, setFormData] = useState({
     nama: '',
-    namaPemilik: '', // Tambahkan field baru
+    namaPemilik: '', 
     sektor: '',
     status: 'aktif',
     latitude: '',
@@ -48,12 +49,12 @@ export default function EditUsahaPage() {
   const fetchUsaha = async () => {
     try {
       const res = await fetch(`/api/usaha/${params.id}`)
+      if (!res.ok) throw new Error("Gagal mengambil data")
       const data = await res.json()
       
-      // FIX NULL ERROR: Gunakan "|| ''" untuk setiap field yang mungkin null di database
       setFormData({
         nama: data.nama || '',
-        namaPemilik: data.namaPemilik || '', // Mapping field baru
+        namaPemilik: data.namaPemilik || '', 
         sektor: data.sektor || '',
         status: data.status || 'aktif',
         latitude: data.latitude?.toString() || '',
@@ -73,6 +74,9 @@ export default function EditUsahaPage() {
       }
     } catch (error) {
       console.error('Error fetching usaha:', error)
+      toast.error("Gagal Memuat Data", {
+        description: "Data usaha tidak ditemukan atau terjadi kesalahan server."
+      })
     } finally {
       setLoading(false)
     }
@@ -117,24 +121,45 @@ export default function EditUsahaPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (coordinateError || !formData.latitude) return
-    setSaving(true)
-    try {
-      const res = await fetch(`/api/usaha/${params.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            ...formData,
-            latitude: Number(formData.latitude),
-            longitude: Number(formData.longitude)
-        }),
-      })
-      if (res.ok) router.push('/admin/usaha')
-    } catch (error) {
-      console.error('Error updating:', error)
-    } finally {
-      setSaving(false)
+    if (coordinateError || !formData.latitude) {
+        toast.error("Validasi Gagal", { description: "Pastikan titik koordinat sudah terisi dengan benar." })
+        return
     }
+
+    setSaving(true)
+
+    // Menjalankan proses simpan dengan animasi toast
+    const promise = async () => {
+        const res = await fetch(`/api/usaha/${params.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ...formData,
+                latitude: Number(formData.latitude),
+                longitude: Number(formData.longitude)
+            }),
+        })
+        
+        if (!res.ok) {
+            const errorData = await res.json()
+            throw new Error(errorData.error || "Gagal memperbarui data")
+        }
+        
+        return res.json()
+    }
+
+    toast.promise(promise(), {
+        loading: 'Menyimpan perubahan...',
+        success: () => {
+            router.push('/admin/usaha')
+            router.refresh()
+            return `Data ${formData.nama} Berhasil Diperbarui`
+        },
+        error: (err) => {
+            setSaving(false)
+            return `Kesalahan: ${err.message}`
+        }
+    })
   }
 
   if (loading) {
@@ -191,7 +216,7 @@ export default function EditUsahaPage() {
                   <input type="text" name="nama" value={formData.nama} onChange={handleChange} required className={inputClassName} />
                 </div>
 
-                {/* Nama Pemilik - BARU */}
+                {/* Nama Pemilik */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><User size={12} className="text-blue-600" /> Nama Pemilik *</label>
                   <input type="text" name="namaPemilik" value={formData.namaPemilik} onChange={handleChange} required className={inputClassName} placeholder="Nama Lengkap Pemilik" />
@@ -200,7 +225,7 @@ export default function EditUsahaPage() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><Info size={12} className="text-blue-600" /> Sektor *</label>
                   <div className="relative">
-                    <select name="sektor" value={formData.sektor} onChange={handleChange} required className={`${inputClassName} appearance-none pr-10`}>
+                    <select name="sektor" value={formData.sektor} onChange={handleChange} required className={`${inputClassName} appearance-none pr-10 font-bold`}>
                       <option value="">Pilih Sektor</option>
                       {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -211,7 +236,7 @@ export default function EditUsahaPage() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><ShieldCheck size={12} className="text-blue-600" /> Status</label>
                   <div className="relative">
-                    <select name="status" value={formData.status} onChange={handleChange} className={`${inputClassName} appearance-none pr-10`}>
+                    <select name="status" value={formData.status} onChange={handleChange} className={`${inputClassName} appearance-none pr-10 font-bold`}>
                       {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -277,7 +302,7 @@ export default function EditUsahaPage() {
 
                 <div className="lg:col-span-3 space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2"><FileText size={12} className="text-blue-600" /> Deskripsi Usaha</label>
-                  <textarea name="deskripsi" value={formData.deskripsi} onChange={handleChange} rows={3} className={`${inputClassName} resize-none`} />
+                  <textarea name="deskripsi" value={formData.deskripsi} onChange={handleChange} rows={3} className={`${inputClassName} resize-none font-bold`} />
                 </div>
               </div>
 

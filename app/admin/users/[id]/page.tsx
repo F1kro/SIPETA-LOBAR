@@ -17,11 +17,12 @@ import {
   UserCog 
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner' // Import library Sonner
 
 interface Admin {
   id: string
   email: string
-  role: string // Tambahkan role di interface
+  role: string 
   createdAt: string
 }
 
@@ -37,7 +38,7 @@ export default function EditAdminPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: '', // Tambahkan state role
+    role: '', 
   })
   const [error, setError] = useState('')
 
@@ -59,12 +60,15 @@ export default function EditAdminPage() {
       setAdmin(data)
       setFormData(prev => ({ 
         ...prev, 
-        email: data.email,
-        role: data.role // Set role dari database
+        email: data.email || '',
+        role: data.role || 'PEGAWAI' 
       }))
       
     } catch (error) {
       console.error('Error fetching admin:', error)
+      toast.error("Gagal Memuat Data", {
+        description: "Akun admin tidak ditemukan atau terjadi gangguan koneksi."
+      })
       setError('Gagal memuat data admin')
     } finally {
       setLoading(false)
@@ -75,42 +79,55 @@ export default function EditAdminPage() {
     e.preventDefault()
     setError('')
 
+    // Validasi Password sebelum kirim
     if (formData.password && formData.password !== formData.confirmPassword) {
-      setError('Konfirmasi password tidak cocok!')
+      const msg = 'Konfirmasi password tidak cocok!'
+      setError(msg)
+      toast.error(msg)
       return
     }
 
     if (formData.password && formData.password.length < 6) {
-      setError('Password baru minimal 6 karakter!')
+      const msg = 'Password baru minimal 6 karakter!'
+      setError(msg)
+      toast.error(msg)
       return
     }
 
     setSaving(true)
 
-    try {
-      const res = await fetch(`/api/admin/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          role: formData.role, // Kirim update role
-          password: formData.password || undefined,
-        }),
-      })
+    const promise = async () => {
+        const res = await fetch(`/api/admin/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.email,
+              role: formData.role,
+              password: formData.password || undefined,
+            }),
+        })
 
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.error || 'Gagal mengubah data admin')
-        return
-      }
+        if (!res.ok) {
+            const data = await res.json()
+            throw new Error(data.error || 'Gagal mengubah data admin')
+        }
 
-      router.push('/admin/users')
-      router.refresh()
-    } catch (error) {
-      setError('Terjadi kesalahan koneksi')
-    } finally {
-      setSaving(false)
+        return res.json()
     }
+
+    toast.promise(promise(), {
+        loading: 'Memperbarui data akun...',
+        success: () => {
+            router.push('/admin/users')
+            router.refresh()
+            return `Akun ${formData.email} Berhasil Diperbarui`
+        },
+        error: (err) => {
+            setSaving(false)
+            setError(err.message)
+            return `Kesalahan: ${err.message}`
+        }
+    })
   }
 
   if (loading) {
@@ -162,11 +179,11 @@ export default function EditAdminPage() {
 
       {/* 2. FORM CONTAINER */}
       <form onSubmit={handleSubmit}>
-        <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
+        <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0 text-left">
           
-          <div className="bg-slate-900 px-8 py-5 flex items-center justify-between relative overflow-hidden">
+          <div className="bg-slate-900 px-8 py-5 flex items-center justify-between relative overflow-hidden text-left">
              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
-             <div className="flex items-center gap-3 relative z-10">
+             <div className="flex items-center gap-3 relative z-10 text-left">
                 <ShieldCheck className="text-blue-500" size={18} />
                 <h2 className="text-white font-black uppercase tracking-widest text-[10px]">Keamanan & Otoritas Akun</h2>
              </div>
@@ -183,8 +200,7 @@ export default function EditAdminPage() {
           </div>
 
           <div className="p-8 md:p-10 text-left">
-            {/* Grid 4 Kolom agar seimbang dengan field Role baru */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start text-left">
               
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
@@ -206,7 +222,7 @@ export default function EditAdminPage() {
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className={inputClassName}
+                  className={`${inputClassName} font-bold`}
                 >
                   <option value="PEGAWAI">PEGAWAI / STAFF</option>
                   <option value="SUPERADMIN">SUPERADMIN</option>
@@ -222,7 +238,7 @@ export default function EditAdminPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className={inputClassName}
-                  placeholder="KOSONGKAN JIKA TIDAK UBAH"
+                  placeholder="ISI JIKA INGIN GANTI"
                 />
               </div>
 

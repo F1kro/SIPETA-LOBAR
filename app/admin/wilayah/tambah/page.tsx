@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { 
   ArrowLeft, Map, Globe, ShieldCheck, 
   ChevronDown, Save, Loader2, Info, 
-  Clock, Wallet, X, PlusCircle, Link as LinkIcon
+  Wallet, PlusCircle, Link as LinkIcon
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner' // Import library Sonner
 
 const SEKTOR_LIST = [
   'Pariwisata', 'Pertanian', 'Perikanan', 'Peternakan', 
@@ -64,19 +65,27 @@ export default function TambahWilayahPage() {
     if (!cleaned) return
     let match = cleaned.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/)
     if (!match) match = cleaned.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
+    
     if (match) {
       setFormData(prev => ({ ...prev, latitude: match![1], longitude: match![2] }))
     } else {
-      setCoordinateError('Format tidak valid')
+      setCoordinateError('Format tidak valid (Contoh: -8.123, 116.123)')
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.latitude) return alert("Koordinat wajib diisi")
+    
+    if (!formData.latitude || !formData.longitude) {
+      toast.error("Koordinat Wajib Diisi", {
+        description: "Silakan masukkan titik koordinat Maps yang valid."
+      })
+      return
+    }
+
     setLoading(true)
 
-    try {
+    const promise = async () => {
       const payload = {
         ...formData,
         usahaSesuai: JSON.stringify(selectedUsahaSesuai),
@@ -91,18 +100,31 @@ export default function TambahWilayahPage() {
         body: JSON.stringify(payload),
       })
 
-      if (res.ok) router.push('/admin/wilayah')
-    } catch (error) {
-      alert('Terjadi kesalahan')
-    } finally {
-      setLoading(false)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || "Gagal menyimpan data wilayah")
+      }
+      
+      return res.json()
     }
+
+    toast.promise(promise(), {
+      loading: 'Menyimpan data wilayah baru...',
+      success: () => {
+        router.push('/admin/wilayah')
+        return `Wilayah ${formData.desa} Berhasil Ditambahkan`
+      },
+      error: (err) => {
+        setLoading(false)
+        return `Gagal: ${err.message}`
+      }
+    })
   }
 
   const inputClassName = "w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
 
   return (
-    <div className="font-poppins pb-10 w-full max-w-[1400px] mx-auto animate-in fade-in duration-500 space-y-6">
+    <div className="font-poppins pb-10 w-full max-w-[1400px] mx-auto animate-in fade-in duration-500 space-y-6 text-left">
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
@@ -114,20 +136,20 @@ export default function TambahWilayahPage() {
           </div>
         </div>
         <Link href="/admin/wilayah">
-          <Button variant="outline" className="border-2 border-slate-200 rounded-xl px-5 py-5 font-black uppercase tracking-widest text-[10px] hover:bg-slate-900 hover:text-white transition-all flex gap-2">
+          <Button variant="outline" className="border-2 border-slate-200 rounded-xl px-5 py-5 font-black uppercase tracking-widest text-[10px] hover:bg-slate-900 hover:text-white transition-all flex gap-2 shadow-sm">
             <ArrowLeft size={16} /> Kembali
           </Button>
         </Link>
       </div>
 
-      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
+      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0 text-left">
         <div className="bg-slate-900 px-8 py-6 flex items-center justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg"><Map size={20} /></div>
             <div className="text-left">
               <h2 className="text-white font-black uppercase tracking-widest text-[10px] md:text-xs leading-none">Formulir Pemetaan Wilayah</h2>
-              <p className="text-slate-400 text-[9px] font-bold uppercase tracking-tighter mt-1 italic">Lengkapi informasi zonasi secara akurat</p>
+              <p className="text-slate-400 text-[14px] font-bold tracking-tighter mt-1 italic">Lengkapi informasi zonasi secara akurat</p>
             </div>
           </div>
         </div>
@@ -147,7 +169,7 @@ export default function TambahWilayahPage() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><ShieldCheck size={12} className="text-blue-600" /> Status RDTR</label>
                   <div className="relative">
-                    <select value={formData.statusRdtr} onChange={(e) => setFormData({ ...formData, statusRdtr: e.target.value })} className={`${inputClassName} appearance-none pr-10`}>
+                    <select value={formData.statusRdtr} onChange={(e) => setFormData({ ...formData, statusRdtr: e.target.value })} className={`${inputClassName} appearance-none pr-10 font-bold`}>
                       <option value="Tersedia">TERSEDIA</option>
                       <option value="Proses">PROSES</option>
                     </select>
@@ -157,7 +179,8 @@ export default function TambahWilayahPage() {
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><Globe size={12} className="text-blue-600" /> Koordinat Maps *</label>
                   <input type="text" value={coordinates} onChange={(e) => {setCoordinates(e.target.value); parseCoordinates(e.target.value)}} required placeholder="-8.123, 116.123" className={`${inputClassName} ${coordinateError ? 'border-red-500' : 'border-slate-200'}`} />
-                  {formData.latitude && <p className="text-[10px] font-bold text-green-600 uppercase ml-2 italic">✓ Terbaca: {formData.latitude}, {formData.longitude}</p>}
+                  {coordinateError && <p className="text-[10px] font-bold text-red-500 uppercase ml-2">{coordinateError}</p>}
+                  {!coordinateError && formData.latitude && <p className="text-[10px] font-bold text-green-600 uppercase ml-2 italic">✓ Terbaca: {formData.latitude}, {formData.longitude}</p>}
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><LinkIcon size={12} className="text-blue-600" /> Link G-Drive Gambar RDTR</label>
@@ -213,12 +236,12 @@ export default function TambahWilayahPage() {
 
               <div className="space-y-2 lg:col-span-3">
                 <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><Info size={12} /> Catatan Risiko</label>
-                <textarea value={formData.catatanRisiko} onChange={(e) => setFormData({ ...formData, catatanRisiko: e.target.value })} className={inputClassName} rows={1} />
+                <textarea value={formData.catatanRisiko} onChange={(e) => setFormData({ ...formData, catatanRisiko: e.target.value })} className={`${inputClassName} resize-none font-bold`} rows={2} />
               </div>
 
-              <div className="flex justify-end pt-6">
-                <Button type="submit" disabled={loading} className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3">
-                  {loading ? <Loader2 className="animate-spin" size={18} /> : <><Save size={18} /> Simpan Wilayah</>}
+              <div className="flex justify-end pt-6 border-t border-slate-50">
+                <Button type="submit" disabled={loading} className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3 active:scale-95">
+                  {loading ? <><Loader2 className="animate-spin" size={18} /> Memproses...</> : <><Save size={18} /> Simpan Wilayah</>}
                 </Button>
               </div>
             </form>

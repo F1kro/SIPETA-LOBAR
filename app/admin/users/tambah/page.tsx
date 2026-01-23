@@ -17,6 +17,7 @@ import {
   UserCog 
 } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner' // Import library Sonner
 
 export default function TambahAdminPage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function TambahAdminPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'PEGAWAI', // Default role sesuai schema
+    role: 'PEGAWAI',
   })
   const [error, setError] = useState('')
 
@@ -33,46 +34,57 @@ export default function TambahAdminPage() {
     e.preventDefault()
     setError('')
 
+    // Validasi Sederhana Sebelum Kirim
     if (formData.password !== formData.confirmPassword) {
-      setError('Konfirmasi password tidak cocok!')
+      const msg = 'Konfirmasi password tidak cocok!'
+      setError(msg)
+      toast.error(msg)
       return
     }
 
     if (formData.password.length < 6) {
-      setError('Password minimal 6 karakter!')
+      const msg = 'Password minimal 6 karakter!'
+      setError(msg)
+      toast.error(msg)
       return
     }
 
     setLoading(true)
 
-    try {
+    const promise = async () => {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          role: formData.role, // Kirim role ke API
+          role: formData.role,
         }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Gagal membuat admin')
-        return
+        throw new Error(data.error || 'Gagal membuat admin')
       }
 
-      router.push('/admin/users')
-    } catch (error) {
-      setError('Terjadi kesalahan koneksi')
-      console.error('Error:', error)
-    } finally {
-      setLoading(false)
+      return data
     }
+
+    toast.promise(promise(), {
+      loading: 'Mendaftarkan akun admin baru...',
+      success: () => {
+        router.push('/admin/users')
+        return `Akun ${formData.email} berhasil didaftarkan`
+      },
+      error: (err) => {
+        setLoading(false)
+        setError(err.message)
+        return `Registrasi Gagal: ${err.message}`
+      }
+    })
   }
 
-  // Helper untuk style input tetap konsisten
   const inputClassName = "w-full px-5 py-3.5 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm placeholder:text-slate-300"
 
   return (
@@ -104,7 +116,7 @@ export default function TambahAdminPage() {
         </Link>
       </div>
 
-      {/* Error Alert */}
+      {/* Error Alert (Fallback UI) */}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 mx-2">
           <XCircle className="text-red-500 shrink-0" size={18} />
@@ -116,20 +128,17 @@ export default function TambahAdminPage() {
       <form onSubmit={handleSubmit}>
         <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white p-0">
           
-          {/* Header Card Hitam */}
           <div className="bg-slate-900 px-8 py-5 flex items-center justify-between relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none" />
-             <div className="flex items-center gap-3 relative z-10">
+             <div className="flex items-center gap-3 relative z-10 text-left">
                 <ShieldCheck className="text-blue-500" size={18} />
                 <h2 className="text-white font-black uppercase tracking-widest text-[10px]">Kredensial & Otoritas Akun</h2>
              </div>
           </div>
 
           <div className="p-8 md:p-10 text-left">
-            {/* Grid 4 Kolom agar tetap muat dalam satu baris di layar lebar */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
               
-              {/* Kolom 1: Email */}
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Mail size={12} className="text-blue-600" /> Email Address
@@ -144,7 +153,6 @@ export default function TambahAdminPage() {
                 />
               </div>
 
-              {/* Kolom 2: Password */}
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Password
@@ -159,7 +167,6 @@ export default function TambahAdminPage() {
                 />
               </div>
 
-              {/* Kolom 3: Konfirmasi */}
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <Lock size={12} className="text-blue-600" /> Konfirmasi Password
@@ -174,7 +181,6 @@ export default function TambahAdminPage() {
                 />
               </div>
 
-              {/* Kolom 4: Role Selection (Baru) */}
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                   <UserCog size={12} className="text-blue-600" /> Otoritas Role
@@ -182,7 +188,7 @@ export default function TambahAdminPage() {
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className={inputClassName}
+                  className={`${inputClassName} font-bold`}
                 >
                   <option value="PEGAWAI">PEGAWAI / STAFF</option>
                   <option value="SUPERADMIN">SUPERADMIN</option>
@@ -191,7 +197,6 @@ export default function TambahAdminPage() {
 
             </div>
 
-            {/* Tombol Aksi */}
             <div className="mt-10 flex flex-col md:flex-row gap-4 justify-end border-t border-slate-50 pt-8">
                <Link href="/admin/users" className="md:w-40">
                   <Button type="button" variant="outline" className="w-full h-14 rounded-2xl border-2 border-slate-200 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50">
@@ -213,7 +218,6 @@ export default function TambahAdminPage() {
           </div>
         </Card>
       </form>
-
     </div>
   )
 }

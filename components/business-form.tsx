@@ -7,6 +7,7 @@ import {
   ShieldCheck, Image as ImageIcon, FileText, ChevronDown, User 
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner' // Import library Sonner
 
 interface BusinessFormProps {
   initialData?: any
@@ -20,7 +21,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
   
   const [formData, setFormData] = useState({
     nama: initialData?.nama || '',
-    namaPemilik: initialData?.namaPemilik || '', // Field Baru
+    namaPemilik: initialData?.namaPemilik || '',
     deskripsi: initialData?.deskripsi || '',
     sektor: initialData?.sektor || '',
     status: initialData?.status || 'Aktif',
@@ -91,12 +92,15 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
     setError(null)
     
     if (!formData.latitude || !formData.longitude) {
-      setError('Koordinat lokasi wajib diisi')
+      toast.error("Koordinat Wajib Diisi", {
+        description: "Pastikan Anda memasukkan titik lokasi yang valid."
+      })
       setLoading(false)
       return
     }
 
-    try {
+    // Gunakan toast.promise untuk UX yang lebih interaktif
+    const promise = async () => {
       const dataToSubmit = {
         ...formData,
         latitude: Number(formData.latitude),
@@ -117,12 +121,25 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan')
       
-      if (onSuccess) onSuccess()
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+      return result
     }
+
+    toast.promise(promise(), {
+      loading: 'Menghubungkan ke server...',
+      success: (data) => {
+        if (onSuccess) onSuccess()
+        return initialData?.id 
+          ? `Data ${formData.nama} Berhasil Diperbarui` 
+          : `Data ${formData.nama} Berhasil Disimpan`;
+      },
+      error: (err) => {
+        setError(err.message)
+        return `Gagal: ${err.message}`;
+      },
+      finally: () => {
+        setLoading(false)
+      }
+    })
   }
 
   const inputClassName = "w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
@@ -153,7 +170,7 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           />
         </div>
 
-        {/* Nama Pemilik (BARU) */}
+        {/* Nama Pemilik */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
             <User size={12} className="text-blue-600" /> Nama Pemilik / Direktur *

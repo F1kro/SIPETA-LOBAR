@@ -5,6 +5,8 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Poppins } from 'next/font/google'
 import { Footer } from "@/components/footer"
+import { Toaster } from "sonner"
+
 
 // KONFIGURASI FONT ASLI KAMU - TIDAK DIUBAH
 const poppins = Poppins({ 
@@ -58,6 +60,7 @@ export default function RootLayout({
         {children}
         <Analytics />
         <Footer />
+        <Toaster/>
         <div id="google_translate_element"></div>
       </body>
     </html>
