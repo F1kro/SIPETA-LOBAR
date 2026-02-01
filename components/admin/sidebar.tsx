@@ -83,10 +83,6 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
           
           {isLoaded && menuItems.map((item) => {
             const Icon = item.icon
-            
-            // LOGIKA ACTIVE BARU:
-            // 1. Jika path adalah /admin (Dashboard), harus persis (exact match)
-            // 2. Jika path lain, gunakan startsWith agar sub-path (tambah/edit) tetap active
             const isActive = item.href === '/admin' 
               ? pathname === '/admin'
               : pathname.startsWith(item.href)

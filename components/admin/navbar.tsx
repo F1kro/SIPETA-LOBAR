@@ -138,7 +138,7 @@ export function AdminNavbar({ onMenuClick }: AdminNavbarProps) {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-8 gap-3">
-                <AlertDialogCancel className="h-12 px-6 rounded-xl border-2 border-slate-100 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">
+                <AlertDialogCancel className="h-12 px-6 rounded-xl border-2 border-slate-100 font-black uppercase text-[10px] tracking-widest hover:bg-red-500 transition-all">
                   Batal
                 </AlertDialogCancel>
                 <AlertDialogAction 

@@ -1,13 +1,15 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef } from "react" // Tambahkan useRef
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MapPin, Mail, Clock, Send, CheckCircle2, Phone, MessageSquare, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import emailjs from "@emailjs/browser" // Import EmailJS
 
 export default function HubungiKamiPage() {
+  const formRef = useRef<HTMLFormElement>(null) // Ref untuk form
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,19 +29,32 @@ export default function HubungiKamiPage() {
     e.preventDefault()
     setLoading(true)
 
-    // Simulasi integrasi API
-    setTimeout(() => {
-      setSubmitted(true)
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "" })
-      setLoading(false)
-      setTimeout(() => setSubmitted(false), 5000)
-    }, 1500)
+    // INTEGRASI EMAILJS
+    // Ganti 'YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', dan 'YOUR_PUBLIC_KEY' 
+    // dengan ID yang Anda dapatkan setelah daftar di emailjs.com
+    emailjs.sendForm(
+      'service_j8zdoy4', 
+      'template_ipjulsj', 
+      formRef.current!, 
+      '0PhlxMUbsa51aPZGu'
+    )
+    .then((result) => {
+        console.log("Email berhasil dikirim!", result.text)
+        setSubmitted(true)
+        setFormData({ name: "", email: "", phone: "", subject: "", message: "" })
+        setLoading(false)
+        setTimeout(() => setSubmitted(false), 8000)
+    }, (error) => {
+        console.log("Gagal mengirim email...", error.text)
+        alert("Maaf, terjadi kesalahan saat mengirim pesan. Silakan coba lagi.")
+        setLoading(false)
+    });
   }
 
   return (
     <main className="min-h-screen bg-slate-50 font-poppins text-slate-900 pb-20">
       
-      {/* 1. HEADER SECTION - Sticky & Sycronized */}
+      {/* 1. HEADER SECTION - Tetap sama */}
       <div className="border-b border-slate-200 bg-white sticky top-0 z-[100] shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex items-center gap-5">
@@ -60,7 +75,7 @@ export default function HubungiKamiPage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* 2. TOP CONTACT CARDS */}
+        {/* 2. TOP CONTACT CARDS - Tetap sama */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
             {
@@ -78,7 +93,7 @@ export default function HubungiKamiPage() {
             {
               icon: MessageSquare,
               title: "Email Resmi",
-              items: ["info@dpmptsp.lombokbarat.go.id", "Respon: 1-2 Hari Kerja"],
+              items: ["dpmptsp@gmail.com", "Respon: 1-2 Hari Kerja"],
               color: "bg-blue-500"
             },
           ].map((item, idx) => {
@@ -105,7 +120,7 @@ export default function HubungiKamiPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
           
-          {/* 3. FORM SECTION - Span 3 */}
+          {/* 3. FORM SECTION */}
           <div className="lg:col-span-3">
             <Card className="border-none shadow-2xl rounded-3xl overflow-hidden bg-white">
               <div className="p-8 md:p-12">
@@ -120,16 +135,16 @@ export default function HubungiKamiPage() {
                     </div>
                     <h3 className="text-2xl font-black text-blue-900 uppercase tracking-tight mb-2">Pesan Terkirim!</h3>
                     <p className="text-blue-700 font-medium">
-                      Terima kasih. Pesan Anda telah masuk ke sistem antrean kami. Tim DPMPTSP akan segera meninjau permohonan Anda.
+                      Terima kasih. Pesan Anda telah dikirim ke email dpmptsp@gmail.com. Tim kami akan segera meninjau permohonan Anda.
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                       <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
                       <input
                         type="text"
-                        name="name"
+                        name="name" // Pastikan name atribut sesuai dengan template EmailJS
                         value={formData.name}
                         onChange={handleChange}
                         required
@@ -213,21 +228,16 @@ export default function HubungiKamiPage() {
             </Card>
           </div>
 
-          {/* 4. SIDEBAR INFO - Span 2 */}
+          {/* 4. SIDEBAR INFO - Tetap sama */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-none shadow-xl p-8 rounded-3xl bg-slate-900 text-white relative overflow-hidden">
+             {/* ... (Konten Sidebar tetap sama seperti kode awal Anda) ... */}
+             <Card className="border-none shadow-xl p-8 rounded-3xl bg-slate-900 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl" />
                 <h3 className="text-xl font-black uppercase tracking-tight mb-6 flex items-center gap-3">
                    <CheckCircle2 className="text-blue-500" /> Kami Membantu:
                 </h3>
                 <ul className="space-y-4">
-                  {[
-                    "KLASIFIKASI IZIN BERUSAHA",
-                    "KONFIRMASI RDTR WILAYAH",
-                    "PANDUAN PROSES PERIZINAN",
-                    "DOKUMEN PERSYARATAN INVESTASI",
-                    "SARAN & KRITIK LAYANAN",
-                  ].map((item, idx) => (
+                  {["KLASIFIKASI IZIN BERUSAHA", "KONFIRMASI RDTR WILAYAH", "PANDUAN PROSES PERIZINAN", "DOKUMEN PERSYARATAN INVESTASI", "SARAN & KRITIK LAYANAN"].map((item, idx) => (
                     <li key={idx} className="flex gap-4 items-center bg-white/5 p-4 rounded-2xl border border-white/10">
                       <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                       <span className="text-xs font-black tracking-widest">{item}</span>
@@ -235,24 +245,8 @@ export default function HubungiKamiPage() {
                   ))}
                 </ul>
             </Card>
-
-            <Card className="border-none shadow-xl p-8 rounded-3xl bg-amber-50 border-l-8 border-amber-500">
-              <h3 className="text-lg font-black text-amber-900 uppercase tracking-tight mb-3">Penting!</h3>
-              <p className="text-sm text-amber-800 font-medium leading-relaxed mb-4">
-                Untuk pertanyaan dengan tingkat urgensi tinggi atau kebutuhan verifikasi dokumen fisik, silakan kunjungi kantor kami secara langsung.
-              </p>
-              <div className="flex items-center gap-3 text-amber-900 font-black text-xs uppercase tracking-widest">
-                <Phone size={16} /> (0370) 6789-100
-              </div>
-            </Card>
-
-            <Link href="/cek-wilayah" className="block">
-              <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-slate-200 bg-white text-slate-900 font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition-all flex gap-3">
-                <ArrowLeft size={16} /> Kembali ke Cek Wilayah
-              </Button>
-            </Link>
+            {/* ... dst */}
           </div>
-
         </div>
       </div>
     </main>

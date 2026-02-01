@@ -1,4 +1,4 @@
-"use client" // Wajib Client Component karena ada script Google di head
+"use client"
 
 import type React from "react"
 import { Analytics } from "@vercel/analytics/next"

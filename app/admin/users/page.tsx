@@ -22,7 +22,7 @@ import {
 interface Admin {
   id: string
   email: string
-  role: 'SUPERADMIN' | 'PEGAWAI' // Update interface sesuai schema
+  role: 'SUPERADMIN' | 'PEGAWAI' 
   createdAt: string
 }
 
@@ -31,8 +31,6 @@ export default function UsersListPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   
-  // LOGIKA ROLE: Ambil role user yang sedang login dari localStorage/Session
-  // Admin biasa (PEGAWAI) tidak bisa melihat tombol Tambah, Edit, dan Hapus
   const [currentAdminRole, setCurrentAdminRole] = useState<string | null>(null)
 
   useEffect(() => {
