@@ -2,7 +2,7 @@
 
 Sistem admin panel lengkap untuk mengelola data usaha, wilayah, dan users di DPMPTSP Kabupaten Lombok Barat.
 
-## 🎯 Fitur Utama
+## 🎯 Fitur Utama --
 
 ### Admin Panel (`/admin`)
 - **Dashboard** - Overview statistik usaha, wilayah, dan users
@@ -62,7 +62,7 @@ Akses di:
 └── public/              # Static assets
 ```
 
-## 🗄️ Database Schema
+## 🗄️ Database Schema --
 
 ### Usaha (Business Listings)
 - ID, nama, sektor, deskripsi, lokasi (lat/lon)
