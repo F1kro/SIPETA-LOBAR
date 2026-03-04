@@ -108,16 +108,38 @@ const getMenuInfo = (pathname: string): MenuInfo => {
   return DEFAULT_INFO
 }
 
+const getSeenScope = (pathname: string) => {
+  if (pathname.startsWith("/peta-usaha")) return "/peta-usaha"
+  if (pathname.startsWith("/cek-wilayah")) return "/cek-wilayah"
+  if (pathname.startsWith("/perizinan")) return "/perizinan"
+  if (pathname.startsWith("/konsultasi") || pathname.startsWith("/hubungi-kami")) return "/konsultasi"
+  if (pathname.startsWith("/faq")) return "/faq"
+  if (pathname.startsWith("/tentang")) return "/tentang"
+  if (pathname === "/") return "/"
+  return pathname
+}
+
 export function FloatingMenuInfo() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
   const info = useMemo(() => getMenuInfo(pathname), [pathname])
-  const seenKey = useMemo(() => `menu_info_seen:${pathname}`, [pathname])
+  const seenScope = useMemo(() => getSeenScope(pathname), [pathname])
+  const seenKey = useMemo(() => `menu_info_seen:${seenScope}`, [seenScope])
 
   useEffect(() => {
     try {
       const seen = window.localStorage.getItem(seenKey)
+      const hasLegacyPetaUsahaSeen =
+        seenScope === "/peta-usaha" &&
+        Object.keys(window.localStorage).some((key) => key.startsWith("menu_info_seen:/peta-usaha/"))
+
+      if (!seen && hasLegacyPetaUsahaSeen) {
+        window.localStorage.setItem(seenKey, "1")
+        setOpen(false)
+        return
+      }
+
       if (!seen) {
         setOpen(true)
         window.localStorage.setItem(seenKey, "1")
@@ -127,7 +149,7 @@ export function FloatingMenuInfo() {
     } catch {
       setOpen(false)
     }
-  }, [seenKey])
+  }, [seenKey, seenScope])
 
   return (
     <>
