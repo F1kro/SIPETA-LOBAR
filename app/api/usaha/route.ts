@@ -1,6 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
+import {
+  asSafeString,
+  parseRupiahToBigInt,
+  parseYearFromDateText,
+  resolveWilayahCoordinate,
+  toNullableString,
+} from '@/lib/usaha-utils'
 
 // GET all usaha
 export async function GET(req: NextRequest) {
@@ -44,17 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const requiredFields = [
-      'nama', 
-      'namaPemilik', 
-      'sektor', 
-      'latitude', 
-      'longitude', 
-      'kecamatan', 
-      'desa', 
-      'nomerTelp', 
-      'email'
-    ]
+    const requiredFields = ['nama', 'namaPemilik', 'sektor', 'kecamatan', 'desa']
 
     for (const field of requiredFields) {
       if (!body[field]) {
@@ -65,22 +62,35 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const kecamatan = asSafeString(body.kecamatan)
+    const desa = asSafeString(body.desa)
+    const regionPoint = await resolveWilayahCoordinate(kecamatan, desa)
+    if (!regionPoint) {
+      return NextResponse.json(
+        { error: `Wilayah tidak ditemukan untuk ${desa}, ${kecamatan}` },
+        { status: 400 },
+      )
+    }
+
     const usaha = await prisma.usaha.create({
       data: {
-        nama: body.nama,
-        namaPemilik: body.namaPemilik, 
-        sektor: body.sektor,
-        status: body.status || 'Aktif',
-        latitude: parseFloat(body.latitude),
-        longitude: parseFloat(body.longitude),
-        kecamatan: body.kecamatan,
-        desa: body.desa,
-        nomerTelp: body.nomerTelp,
-        email: body.email,
-        deskripsi: body.deskripsi || null,
-        gambar: body.gambar || null,
-        investasi: body.investasi ? BigInt(body.investasi) : null,
-        tahunBerdiri: body.tahunBerdiri ? parseInt(body.tahunBerdiri) : null,
+        nama: asSafeString(body.nama),
+        namaPemilik: asSafeString(body.namaPemilik),
+        sektor: asSafeString(body.sektor),
+        status: asSafeString(body.status) || 'Aktif',
+        latitude: regionPoint.latitude,
+        longitude: regionPoint.longitude,
+        kecamatan,
+        desa,
+        nomerTelp: asSafeString(body.nomerTelp) || '-',
+        email: asSafeString(body.email) || '-',
+        deskripsi: toNullableString(body.deskripsi),
+        gambar: toNullableString(body.gambar),
+        investasi: parseRupiahToBigInt(body.investasi),
+        tahunBerdiri:
+          typeof body.tahunBerdiri === 'number'
+            ? body.tahunBerdiri
+            : parseYearFromDateText(body.tahunBerdiri),
       },
     })
 

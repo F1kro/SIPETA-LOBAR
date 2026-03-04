@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -16,7 +16,8 @@ import {
   Phone, 
   Mail,
   MapPin,
-  User
+  User,
+  Upload
 } from "lucide-react"
 
 interface Usaha {
@@ -34,7 +35,9 @@ interface Usaha {
 export default function UsahaListPage() {
   const [usahas, setUsahas] = useState<Usaha[]>([])
   const [loading, setLoading] = useState(true)
+  const [importing, setImporting] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 7
@@ -62,6 +65,42 @@ export default function UsahaListPage() {
       if (res.ok) fetchUsahas()
     } catch (error) {
       console.error("Error deleting usaha:", error)
+    }
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setImporting(true)
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const res = await fetch("/api/usaha/import", {
+        method: "POST",
+        body: formData,
+      })
+
+      const result = await res.json()
+      if (!res.ok) {
+        alert(result.error || "Gagal import data")
+        return
+      }
+
+      const skippedCount = Array.isArray(result.skipped) ? result.skipped.length : 0
+      alert(`Import berhasil: ${result.imported} data. Dilewati: ${skippedCount} data.`)
+      fetchUsahas()
+    } catch (error) {
+      console.error("Error importing usaha:", error)
+      alert("Terjadi kesalahan saat import file")
+    } finally {
+      setImporting(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
   }
 
@@ -96,6 +135,21 @@ export default function UsahaListPage() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <Button
+            onClick={handleImportClick}
+            disabled={importing}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-6 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-200 transition-all flex gap-3"
+          >
+            <Upload size={18} />
+            {importing ? "Import..." : "Import XLSX"}
+          </Button>
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <input 

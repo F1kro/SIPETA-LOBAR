@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { resolveMasterCoordinate } from "@/lib/wilayah-master";
 
 export async function GET(
   req: Request,
@@ -24,14 +25,31 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await req.json();
+
+    const kecamatan = String(body.kecamatan || '').trim()
+    const desa = String(body.desa || '').trim()
+    const masterPoint = resolveMasterCoordinate(kecamatan, desa)
+    if (!masterPoint) {
+      return Response.json(
+        { error: `Wilayah ${desa}, ${kecamatan} tidak ada pada referensi geolokasi` },
+        { status: 400 },
+      )
+    }
     
     const updated = await prisma.wilayah.update({
       where: { id },
       data: {
-        ...body,
-        // Pastikan koordinat tetap float di tingkat database
-        latitude: parseFloat(body.latitude),
-        longitude: parseFloat(body.longitude),
+        kecamatan,
+        desa,
+        statusRdtr: body.statusRdtr,
+        usahaSesuai: body.usahaSesuai,
+        perluKajian: body.perluKajian,
+        catatanRisiko: body.catatanRisiko || '',
+        estimasiBiaya: body.estimasiBiaya || '',
+        estimasiWaktu: body.estimasiWaktu || '',
+        gambarRdtr: body.gambarRdtr || '',
+        latitude: masterPoint.latitude,
+        longitude: masterPoint.longitude,
       }
     });
     

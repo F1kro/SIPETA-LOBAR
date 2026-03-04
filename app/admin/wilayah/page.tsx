@@ -12,9 +12,7 @@ import {
   Map,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Globe,
-  Wallet
+  ShieldCheck
 } from 'lucide-react'
 
 interface Wilayah {
@@ -22,8 +20,6 @@ interface Wilayah {
   kecamatan: string
   desa: string
   statusRdtr: string
-  latitude: number
-  longitude: number
   estimasiBiaya?: string
 }
 
@@ -143,9 +139,6 @@ export default function WilayahListPage() {
                       Desa / Kelurahan
                     </th>
                     <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                      Koordinat
-                    </th>
-                    <th className="px-6 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                       Status RDTR
                     </th>
                     <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] last:rounded-tr-[2.5rem]">
@@ -168,16 +161,6 @@ export default function WilayahListPage() {
                         <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">
                           {wilayah.desa}
                         </span>
-                      </td>
-
-                      {/* KOORDINAT */}
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Globe size={14} className="text-blue-500" />
-                          <span className="text-[10px] font-mono font-bold">
-                            {wilayah.latitude.toFixed(4)}, {wilayah.longitude.toFixed(4)}
-                          </span>
-                        </div>
                       </td>
 
                       {/* STATUS RDTR */}

@@ -1,0 +1,734 @@
+[
+  {
+    "desa": "Batu Layar Barat",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.5106965,
+    "longitude": 116.06497405
+  },
+  {
+    "desa": "Batulayar",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.51059283,
+    "longitude": 116.0789348
+  },
+  {
+    "desa": "Bengkaung",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.46793471,
+    "longitude": 116.07119704
+  },
+  {
+    "desa": "Lembah Sari",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.52031808,
+    "longitude": 116.09835418
+  },
+  {
+    "desa": "Meninting",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.54618198,
+    "longitude": 116.07591797
+  },
+  {
+    "desa": "Pusuk Lestari",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.46979171,
+    "longitude": 116.07931591
+  },
+  {
+    "desa": "Sandik",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.53716678,
+    "longitude": 116.08903817
+  },
+  {
+    "desa": "Santeluk",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.53272381,
+    "longitude": 116.07617247
+  },
+  {
+    "desa": "Senggigi",
+    "kecamatan": "Batu Layar",
+    "latitude": -8.47028524,
+    "longitude": 116.04694417
+  },
+  {
+    "desa": "Babussalam",
+    "kecamatan": "Gerung",
+    "latitude": -8.68046202,
+    "longitude": 116.14887064
+  },
+  {
+    "desa": "Banyu Urip",
+    "kecamatan": "Gerung",
+    "latitude": -8.72265666,
+    "longitude": 116.15452664
+  },
+  {
+    "desa": "Beleke",
+    "kecamatan": "Gerung",
+    "latitude": -8.66332964,
+    "longitude": 116.12906884
+  },
+  {
+    "desa": "Dasan Tapen",
+    "kecamatan": "Gerung",
+    "latitude": -8.66147312,
+    "longitude": 116.14215891
+  },
+  {
+    "desa": "Gapuk",
+    "kecamatan": "Gerung",
+    "latitude": -8.67321834,
+    "longitude": 116.10603522
+  },
+  {
+    "desa": "Giri Tembesi",
+    "kecamatan": "Gerung",
+    "latitude": -8.71542005,
+    "longitude": 116.12355845
+  },
+  {
+    "desa": "Kebon Ayu",
+    "kecamatan": "Gerung",
+    "latitude": -8.68571799,
+    "longitude": 116.0971077
+  },
+  {
+    "desa": "Kelurahan Dasan Geres",
+    "kecamatan": "Gerung",
+    "latitude": -8.68253853,
+    "longitude": 116.13910024
+  },
+  {
+    "desa": "Kelurahan Gerung Selatan",
+    "kecamatan": "Gerung",
+    "latitude": -8.69070116,
+    "longitude": 116.12425778
+  },
+  {
+    "desa": "Kelurahan Gerung Utara",
+    "kecamatan": "Gerung",
+    "latitude": -8.68379266,
+    "longitude": 116.12156147
+  },
+  {
+    "desa": "Mesanggok",
+    "kecamatan": "Gerung",
+    "latitude": -8.67739574,
+    "longitude": 116.1154405
+  },
+  {
+    "desa": "Suka Makmur",
+    "kecamatan": "Gerung",
+    "latitude": -8.65796486,
+    "longitude": 116.09996989
+  },
+  {
+    "desa": "Taman Ayu",
+    "kecamatan": "Gerung",
+    "latitude": -8.65828854,
+    "longitude": 116.08027898
+  },
+  {
+    "desa": "Tempos",
+    "kecamatan": "Gerung",
+    "latitude": -8.69682906,
+    "longitude": 116.14592873
+  },
+  {
+    "desa": "Bukittinggi",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.47557985,
+    "longitude": 116.15965066
+  },
+  {
+    "desa": "Dopang",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.51573637,
+    "longitude": 116.12785119
+  },
+  {
+    "desa": "Gelangsar",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.4729862,
+    "longitude": 116.13906316
+  },
+  {
+    "desa": "Guntur Macan",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.51878804,
+    "longitude": 116.12537226
+  },
+  {
+    "desa": "Gunungsari",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.54356928,
+    "longitude": 116.10218919
+  },
+  {
+    "desa": "Jatisela",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.55161927,
+    "longitude": 116.0848507
+  },
+  {
+    "desa": "Jeringo",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.52900176,
+    "longitude": 116.1336229
+  },
+  {
+    "desa": "Kekait",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.4742598,
+    "longitude": 116.10418838
+  },
+  {
+    "desa": "Kekeri",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.55941525,
+    "longitude": 116.12835296
+  },
+  {
+    "desa": "Mambalan",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.54876478,
+    "longitude": 116.13145014
+  },
+  {
+    "desa": "Mekar Sari",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.48247327,
+    "longitude": 116.1447707
+  },
+  {
+    "desa": "Midang",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.552436,
+    "longitude": 116.10926477
+  },
+  {
+    "desa": "Penimbung",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.54487582,
+    "longitude": 116.14186775
+  },
+  {
+    "desa": "Ranjok",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.54719429,
+    "longitude": 116.11997758
+  },
+  {
+    "desa": "Sesele",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.55190694,
+    "longitude": 116.0999796
+  },
+  {
+    "desa": "Taman Sari",
+    "kecamatan": "Gunungsari",
+    "latitude": -8.48861346,
+    "longitude": 116.12580772
+  },
+  {
+    "desa": "Banyumulek",
+    "kecamatan": "Kediri",
+    "latitude": -8.64806212,
+    "longitude": 116.10778331
+  },
+  {
+    "desa": "Dasan Baru",
+    "kecamatan": "Kediri",
+    "latitude": -8.65838298,
+    "longitude": 116.11350689
+  },
+  {
+    "desa": "Gelogor",
+    "kecamatan": "Kediri",
+    "latitude": -8.63809581,
+    "longitude": 116.13693888
+  },
+  {
+    "desa": "Jagaraga Indah",
+    "kecamatan": "Kediri",
+    "latitude": -8.6534502,
+    "longitude": 116.15325155
+  },
+  {
+    "desa": "Kediri",
+    "kecamatan": "Kediri",
+    "latitude": -8.63619204,
+    "longitude": 116.1597681
+  },
+  {
+    "desa": "Kediri Selatan",
+    "kecamatan": "Kediri",
+    "latitude": -8.64623815,
+    "longitude": 116.14876241
+  },
+  {
+    "desa": "Lelede",
+    "kecamatan": "Kediri",
+    "latitude": -8.64781928,
+    "longitude": 116.12117055
+  },
+  {
+    "desa": "Montong Are",
+    "kecamatan": "Kediri",
+    "latitude": -8.63503206,
+    "longitude": 116.1722883
+  },
+  {
+    "desa": "Ombe Baru",
+    "kecamatan": "Kediri",
+    "latitude": -8.64881461,
+    "longitude": 116.14193117
+  },
+  {
+    "desa": "Rumak",
+    "kecamatan": "Kediri",
+    "latitude": -8.64461936,
+    "longitude": 116.12713729
+  },
+  {
+    "desa": "Giri Sasak",
+    "kecamatan": "Kuripan",
+    "latitude": -8.71440683,
+    "longitude": 116.17078103
+  },
+  {
+    "desa": "Jagaraga",
+    "kecamatan": "Kuripan",
+    "latitude": -8.65618254,
+    "longitude": 116.16505489
+  },
+  {
+    "desa": "Kuripan",
+    "kecamatan": "Kuripan",
+    "latitude": -8.67284908,
+    "longitude": 116.16842364
+  },
+  {
+    "desa": "Kuripan Selatan",
+    "kecamatan": "Kuripan",
+    "latitude": -8.68734996,
+    "longitude": 116.16302181
+  },
+  {
+    "desa": "Kuripan Timur",
+    "kecamatan": "Kuripan",
+    "latitude": -8.67250943,
+    "longitude": 116.18236554
+  },
+  {
+    "desa": "Kuripan Utara",
+    "kecamatan": "Kuripan",
+    "latitude": -8.65591197,
+    "longitude": 116.18508075
+  },
+  {
+    "desa": "Bagik Polak",
+    "kecamatan": "Labuapi",
+    "latitude": -8.62256347,
+    "longitude": 116.13408535
+  },
+  {
+    "desa": "Bagik Polak Barat",
+    "kecamatan": "Labuapi",
+    "latitude": -8.6345147,
+    "longitude": 116.12936724
+  },
+  {
+    "desa": "Bajur",
+    "kecamatan": "Labuapi",
+    "latitude": -8.62482439,
+    "longitude": 116.10296726
+  },
+  {
+    "desa": "Bengkel",
+    "kecamatan": "Labuapi",
+    "latitude": -8.61746466,
+    "longitude": 116.14697801
+  },
+  {
+    "desa": "Karang Bongkot",
+    "kecamatan": "Labuapi",
+    "latitude": -8.64183768,
+    "longitude": 116.09672187
+  },
+  {
+    "desa": "Kuranji",
+    "kecamatan": "Labuapi",
+    "latitude": -8.64399091,
+    "longitude": 116.07961999
+  },
+  {
+    "desa": "Kuranji Dalang",
+    "kecamatan": "Labuapi",
+    "latitude": -8.63142597,
+    "longitude": 116.07902509
+  },
+  {
+    "desa": "Labuapi",
+    "kecamatan": "Labuapi",
+    "latitude": -8.62619851,
+    "longitude": 116.12361775
+  },
+  {
+    "desa": "Merembu",
+    "kecamatan": "Labuapi",
+    "latitude": -8.62006132,
+    "longitude": 116.15488083
+  },
+  {
+    "desa": "Perampuan",
+    "kecamatan": "Labuapi",
+    "latitude": -8.63706666,
+    "longitude": 116.08945475
+  },
+  {
+    "desa": "Telagawaru",
+    "kecamatan": "Labuapi",
+    "latitude": -8.63964987,
+    "longitude": 116.1099284
+  },
+  {
+    "desa": "Terong Tawah",
+    "kecamatan": "Labuapi",
+    "latitude": -8.62922784,
+    "longitude": 116.10789868
+  },
+  {
+    "desa": "Eyat Mayang",
+    "kecamatan": "Lembar",
+    "latitude": -8.76087515,
+    "longitude": 116.07126631
+  },
+  {
+    "desa": "Jembatan Gantung",
+    "kecamatan": "Lembar",
+    "latitude": -8.71047014,
+    "longitude": 116.10692581
+  },
+  {
+    "desa": "Jembatan Kembar",
+    "kecamatan": "Lembar",
+    "latitude": -8.70195456,
+    "longitude": 116.08348367
+  },
+  {
+    "desa": "Jembatan Kembar Timur",
+    "kecamatan": "Lembar",
+    "latitude": -8.71796328,
+    "longitude": 116.09783773
+  },
+  {
+    "desa": "Labuan Tereng",
+    "kecamatan": "Lembar",
+    "latitude": -8.74078599,
+    "longitude": 116.07867334
+  },
+  {
+    "desa": "Lembar",
+    "kecamatan": "Lembar",
+    "latitude": -8.69419996,
+    "longitude": 116.07687997
+  },
+  {
+    "desa": "Lembar Selatan",
+    "kecamatan": "Lembar",
+    "latitude": -8.72237439,
+    "longitude": 116.06793092
+  },
+  {
+    "desa": "Mareje",
+    "kecamatan": "Lembar",
+    "latitude": -8.79971382,
+    "longitude": 116.10186772
+  },
+  {
+    "desa": "Mareje Timur",
+    "kecamatan": "Lembar",
+    "latitude": -8.78001234,
+    "longitude": 116.11567992
+  },
+  {
+    "desa": "Sekotong Timur",
+    "kecamatan": "Lembar",
+    "latitude": -8.76362081,
+    "longitude": 116.11045262
+  },
+  {
+    "desa": "Batu Kumbang",
+    "kecamatan": "Lingsar",
+    "latitude": -8.57359988,
+    "longitude": 116.20079444
+  },
+  {
+    "desa": "Batu Mekar",
+    "kecamatan": "Lingsar",
+    "latitude": -8.50927723,
+    "longitude": 116.22439398
+  },
+  {
+    "desa": "Bug-Bug",
+    "kecamatan": "Lingsar",
+    "latitude": -8.57741741,
+    "longitude": 116.15419054
+  },
+  {
+    "desa": "Dasan Geria",
+    "kecamatan": "Lingsar",
+    "latitude": -8.55580963,
+    "longitude": 116.14243284
+  },
+  {
+    "desa": "Duman",
+    "kecamatan": "Lingsar",
+    "latitude": -8.55367582,
+    "longitude": 116.15421617
+  },
+  {
+    "desa": "Gegelang",
+    "kecamatan": "Lingsar",
+    "latitude": -8.586969,
+    "longitude": 116.18186905
+  },
+  {
+    "desa": "Gegerung",
+    "kecamatan": "Lingsar",
+    "latitude": -8.53585426,
+    "longitude": 116.15171964
+  },
+  {
+    "desa": "Giri Madia",
+    "kecamatan": "Lingsar",
+    "latitude": -8.51918602,
+    "longitude": 116.16860789
+  },
+  {
+    "desa": "Gontoran",
+    "kecamatan": "Lingsar",
+    "latitude": -8.58302122,
+    "longitude": 116.1682012
+  },
+  {
+    "desa": "Karang Bayan",
+    "kecamatan": "Lingsar",
+    "latitude": -8.52610048,
+    "longitude": 116.19071298
+  },
+  {
+    "desa": "Langko",
+    "kecamatan": "Lingsar",
+    "latitude": -8.5271904,
+    "longitude": 116.17546729
+  },
+  {
+    "desa": "Lingsar",
+    "kecamatan": "Lingsar",
+    "latitude": -8.57421986,
+    "longitude": 116.17924055
+  },
+  {
+    "desa": "Peteluan Indah",
+    "kecamatan": "Lingsar",
+    "latitude": -8.57758636,
+    "longitude": 116.16182165
+  },
+  {
+    "desa": "Saribaye",
+    "kecamatan": "Lingsar",
+    "latitude": -8.5665112,
+    "longitude": 116.18123958
+  },
+  {
+    "desa": "Sigerongan",
+    "kecamatan": "Lingsar",
+    "latitude": -8.56579319,
+    "longitude": 116.16241401
+  },
+  {
+    "desa": "Badrain",
+    "kecamatan": "Narmada",
+    "latitude": -8.61486637,
+    "longitude": 116.17171846
+  },
+  {
+    "desa": "Batu Kuta",
+    "kecamatan": "Narmada",
+    "latitude": -8.60302397,
+    "longitude": 116.19460151
+  },
+  {
+    "desa": "Buwun Sejati",
+    "kecamatan": "Narmada",
+    "latitude": -8.46758707,
+    "longitude": 116.28370497
+  },
+  {
+    "desa": "Dasan Tereng",
+    "kecamatan": "Narmada",
+    "latitude": -8.60049867,
+    "longitude": 116.18156356
+  },
+  {
+    "desa": "Golong",
+    "kecamatan": "Narmada",
+    "latitude": -8.58870353,
+    "longitude": 116.23642086
+  },
+  {
+    "desa": "Grimax Indah",
+    "kecamatan": "Narmada",
+    "latitude": -8.59522185,
+    "longitude": 116.17128766
+  },
+  {
+    "desa": "Keru",
+    "kecamatan": "Narmada",
+    "latitude": -8.58503344,
+    "longitude": 116.24600734
+  },
+  {
+    "desa": "Kramat Jaya",
+    "kecamatan": "Narmada",
+    "latitude": -8.61087556,
+    "longitude": 116.18014846
+  },
+  {
+    "desa": "Lebah Sempage",
+    "kecamatan": "Narmada",
+    "latitude": -8.53009716,
+    "longitude": 116.28944887
+  },
+  {
+    "desa": "Lembuak",
+    "kecamatan": "Narmada",
+    "latitude": -8.59497653,
+    "longitude": 116.19620681
+  },
+  {
+    "desa": "Mekarsari",
+    "kecamatan": "Narmada",
+    "latitude": -8.60453569,
+    "longitude": 116.16661282
+  },
+  {
+    "desa": "Narmada",
+    "kecamatan": "Narmada",
+    "latitude": -8.58562202,
+    "longitude": 116.2164241
+  },
+  {
+    "desa": "Nyur Lembang",
+    "kecamatan": "Narmada",
+    "latitude": -8.59031395,
+    "longitude": 116.1892742
+  },
+  {
+    "desa": "Pakuan",
+    "kecamatan": "Narmada",
+    "latitude": -8.51368579,
+    "longitude": 116.28875119
+  },
+  {
+    "desa": "Peresak",
+    "kecamatan": "Narmada",
+    "latitude": -8.59237574,
+    "longitude": 116.21661966
+  },
+  {
+    "desa": "Sedau",
+    "kecamatan": "Narmada",
+    "latitude": -8.55215819,
+    "longitude": 116.2793119
+  },
+  {
+    "desa": "Selat",
+    "kecamatan": "Narmada",
+    "latitude": -8.57749011,
+    "longitude": 116.21203569
+  },
+  {
+    "desa": "Sembung",
+    "kecamatan": "Narmada",
+    "latitude": -8.60984457,
+    "longitude": 116.16468307
+  },
+  {
+    "desa": "Sesaot",
+    "kecamatan": "Narmada",
+    "latitude": -8.5150623,
+    "longitude": 116.27046673
+  },
+  {
+    "desa": "Suranadi",
+    "kecamatan": "Narmada",
+    "latitude": -8.57121794,
+    "longitude": 116.238074
+  },
+  {
+    "desa": "Tanak Beak",
+    "kecamatan": "Narmada",
+    "latitude": -8.60756249,
+    "longitude": 116.2039287
+  },
+  {
+    "desa": "Batu Putih",
+    "kecamatan": "Sekotong",
+    "latitude": -8.78909289,
+    "longitude": 115.86042796
+  },
+  {
+    "desa": "Buwun Mas",
+    "kecamatan": "Sekotong",
+    "latitude": -8.87692945,
+    "longitude": 116.01033126
+  },
+  {
+    "desa": "Cendi Manik",
+    "kecamatan": "Sekotong",
+    "latitude": -8.78384375,
+    "longitude": 116.0725756
+  },
+  {
+    "desa": "Gili Gede Indah",
+    "kecamatan": "Sekotong",
+    "latitude": -8.74054853,
+    "longitude": 115.92066986
+  },
+  {
+    "desa": "Kedaro",
+    "kecamatan": "Sekotong",
+    "latitude": -8.7854203,
+    "longitude": 115.99464669
+  },
+  {
+    "desa": "Pelangan",
+    "kecamatan": "Sekotong",
+    "latitude": -8.84344984,
+    "longitude": 115.93948702
+  },
+  {
+    "desa": "Sekotong Barat",
+    "kecamatan": "Sekotong",
+    "latitude": -8.73804782,
+    "longitude": 116.00044085
+  },
+  {
+    "desa": "Sekotong Tengah",
+    "kecamatan": "Sekotong",
+    "latitude": -8.77293571,
+    "longitude": 116.02764082
+  },
+  {
+    "desa": "Taman Baru",
+    "kecamatan": "Sekotong",
+    "latitude": -8.80223861,
+    "longitude": 116.07861962
+  }
+]

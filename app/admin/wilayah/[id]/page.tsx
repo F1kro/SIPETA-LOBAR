@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { useRouter, useParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  ArrowLeft, Map, Globe, ShieldCheck,
+  ArrowLeft, Map, ShieldCheck,
   ChevronDown, Save, Loader2, Info,
   Wallet, Edit3, Link as LinkIcon
 } from 'lucide-react'
@@ -17,19 +17,24 @@ const SEKTOR_LIST = [
   'Perdagangan', 'Industri', 'Jasa', 'Manufaktur', 'Teknologi'
 ]
 
+interface MasterResponse {
+  districts: string[]
+  villagesByDistrict: Record<string, string[]>
+}
+
 export default function EditWilayahPage() {
   const router = useRouter()
   const params = useParams()
   const id = params?.id
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [coordinateError, setCoordinateError] = useState<string | null>(null)
+  const [loadingMaster, setLoadingMaster] = useState(true)
+  const [districts, setDistricts] = useState<string[]>([])
+  const [villagesByDistrict, setVillagesByDistrict] = useState<Record<string, string[]>>({})
 
   const [formData, setFormData] = useState({
     kecamatan: '',
     desa: '',
-    latitude: '',
-    longitude: '',
     statusRdtr: 'Tersedia',
     catatanRisiko: '',
     gambarRdtr: '',
@@ -38,11 +43,32 @@ export default function EditWilayahPage() {
   const [sektorDetails, setSektorDetails] = useState<Record<string, { biaya: string, waktu: string }>>({})
   const [selectedUsahaSesuai, setSelectedUsahaSesuai] = useState<string[]>([])
   const [selectedPerluKajian, setSelectedPerluKajian] = useState<string[]>([])
-  const [coordinates, setCoordinates] = useState('')
 
   useEffect(() => {
     if (id && id !== '[id]') fetchWilayah()
   }, [id])
+
+  useEffect(() => {
+    const loadMaster = async () => {
+      try {
+        const res = await fetch('/api/wilayah/master')
+        const data: MasterResponse = await res.json()
+        setDistricts(Array.isArray(data?.districts) ? data.districts : [])
+        setVillagesByDistrict(data?.villagesByDistrict || {})
+      } catch (e) {
+        console.error('Gagal load referensi wilayah:', e)
+      } finally {
+        setLoadingMaster(false)
+      }
+    }
+
+    loadMaster()
+  }, [])
+
+  const villageOptions = useMemo(() => {
+    if (!formData.kecamatan) return []
+    return villagesByDistrict[formData.kecamatan] || []
+  }, [formData.kecamatan, villagesByDistrict])
 
   const fetchWilayah = async () => {
     try {
@@ -53,8 +79,6 @@ export default function EditWilayahPage() {
       setFormData({
         kecamatan: data.kecamatan || '',
         desa: data.desa || '',
-        latitude: data.latitude?.toString() || '',
-        longitude: data.longitude?.toString() || '',
         statusRdtr: data.statusRdtr || 'Tersedia',
         catatanRisiko: data.catatanRisiko || '',
         gambarRdtr: data.gambarRdtr || '',
@@ -77,10 +101,6 @@ export default function EditWilayahPage() {
         }
       } catch (e) {
         setSektorDetails({})
-      }
-
-      if (data.latitude && data.longitude) {
-        setCoordinates(`${data.latitude}, ${data.longitude}`)
       }
     } catch (error) {
       console.error('Error:', error)
@@ -112,25 +132,8 @@ export default function EditWilayahPage() {
     }))
   }
 
-  const parseCoordinates = (input: string) => {
-    setCoordinateError(null)
-    const cleaned = input.trim()
-    if (!cleaned) return
-    let match = cleaned.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/)
-    if (!match) match = cleaned.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
-    if (match) {
-      setFormData(prev => ({ ...prev, latitude: match![1], longitude: match![2] }))
-    } else {
-      setCoordinateError('Format tidak valid (Contoh: -8.123, 116.123)')
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.latitude) {
-      toast.error("Koordinat Wajib Diisi")
-      return
-    }
     
     setSaving(true)
 
@@ -209,11 +212,43 @@ export default function EditWilayahPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><Map size={12} className="text-blue-600" /> Kecamatan *</label>
-                  <input type="text" required value={formData.kecamatan} onChange={(e) => setFormData({ ...formData, kecamatan: e.target.value })} className={inputClassName} />
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.kecamatan}
+                      onChange={(e) => setFormData({ ...formData, kecamatan: e.target.value, desa: '' })}
+                      className={`${inputClassName} appearance-none pr-10`}
+                      disabled={loadingMaster}
+                    >
+                      <option value="">Pilih kecamatan</option>
+                      {districts.map((kecamatan) => (
+                        <option key={kecamatan} value={kecamatan}>
+                          {kecamatan}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><Map size={12} className="text-blue-600" /> Desa *</label>
-                  <input type="text" required value={formData.desa} onChange={(e) => setFormData({ ...formData, desa: e.target.value })} className={inputClassName} />
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.desa}
+                      onChange={(e) => setFormData({ ...formData, desa: e.target.value })}
+                      className={`${inputClassName} appearance-none pr-10`}
+                      disabled={!formData.kecamatan || loadingMaster}
+                    >
+                      <option value="">Pilih desa/kelurahan</option>
+                      {villageOptions.map((desa) => (
+                        <option key={desa} value={desa}>
+                          {desa}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><ShieldCheck size={12} className="text-blue-600" /> Status RDTR</label>
@@ -223,11 +258,6 @@ export default function EditWilayahPage() {
                   </select>
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><Globe size={12} className="text-blue-600" /> Koordinat Lokasi (Maps) *</label>
-                  <input type="text" value={coordinates} onChange={(e) => { setCoordinates(e.target.value); parseCoordinates(e.target.value) }} className={`${inputClassName} ${coordinateError ? 'border-red-500' : ''}`} placeholder="-8.123, 116.123" />
-                  {coordinateError && <p className="text-[10px] font-bold text-red-500 uppercase ml-2">{coordinateError}</p>}
-                </div>
-                <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-2"><LinkIcon size={12} className="text-blue-600" /> Link RDTR</label>
                   <input type="url" value={formData.gambarRdtr} onChange={(e) => setFormData({ ...formData, gambarRdtr: e.target.value })} className={inputClassName} placeholder="https://..." />
                 </div>

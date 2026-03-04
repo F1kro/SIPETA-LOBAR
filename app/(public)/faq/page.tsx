@@ -81,7 +81,7 @@ export default function FAQPage() {
     <main className="min-h-screen bg-slate-50 font-poppins text-slate-900 pb-20 text-left">
       
       {/* 1. HEADER SECTION - Lebar max-w-6xl sinkron dengan Navbar */}
-      <div className="border-b border-slate-200 bg-white sticky top-0 z-[100] shadow-sm">
+      <div className="hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex items-center gap-5">
             <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">

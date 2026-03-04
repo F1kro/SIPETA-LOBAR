@@ -20,7 +20,7 @@ export default function TentangPage() {
     <main className="min-h-screen bg-slate-50 font-poppins text-slate-900 pb-20 text-left">
 
       {/* 1. HEADER SECTION */}
-      <div className="border-b border-slate-200 bg-white sticky top-0 z-[100] shadow-sm">
+      <div className="hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex items-center gap-4 md:gap-5">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0">
@@ -172,6 +172,37 @@ export default function TentangPage() {
             ))}
           </div>
         </Card>
+
+        {/* Informasi Pengembang */}
+        <div className="mb-20">
+          <Card className="rounded-2xl border-none shadow-xl overflow-hidden bg-white">
+            <div className="p-6 md:p-10 bg-blue-600 text-white">
+              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">Informasi Pengembang</h2>
+              <p className="text-blue-100 font-bold uppercase text-[10px] md:text-xs mt-2 tracking-widest">
+                Project PKL 2026
+              </p>
+            </div>
+            <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <p className="text-slate-900 font-black text-xl tracking-tight">Fiqro Najiah</p>
+                <p className="text-slate-600 font-bold text-sm">NIM: F1D02310051</p>
+                <p className="text-slate-600 font-bold text-sm">Universitas Mataram</p>
+                <p className="text-slate-600 font-bold text-sm">Prodi Teknik Informatika</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl border border-slate-100 p-5 flex flex-col justify-center">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Web Portfolio</span>
+                <a
+                  href="https://masfiq.web.id"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 font-black text-base md:text-lg break-all hover:text-slate-900 transition-colors"
+                >
+                  masfiq.web.id
+                </a>
+              </div>
+            </div>
+          </Card>
+        </div>
 
         {/* Profile Kantor */}
         <div className="mb-20">

@@ -1,148 +1,151 @@
 'use client'
 
-import React, { useState } from 'react'
-import { 
-  Save, Loader2, Building2, MapPin, Phone, 
-  Mail, Globe, Calendar, Wallet, Info, 
-  ShieldCheck, Image as ImageIcon, FileText, ChevronDown, User 
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  Save,
+  Loader2,
+  Building2,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  Wallet,
+  Info,
+  ShieldCheck,
+  FileText,
+  ChevronDown,
+  User,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { toast } from 'sonner' // Import library Sonner
+import { toast } from 'sonner'
 
 interface BusinessFormProps {
   initialData?: any
   onSuccess?: () => void
 }
 
+interface WilayahItem {
+  id: string
+  kecamatan: string
+  desa: string
+}
+
 export default function BusinessForm({ initialData, onSuccess }: BusinessFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [coordinateError, setCoordinateError] = useState<string | null>(null)
-  
+  const [wilayahs, setWilayahs] = useState<WilayahItem[]>([])
+  const [loadingWilayah, setLoadingWilayah] = useState(true)
+
   const [formData, setFormData] = useState({
     nama: initialData?.nama || '',
     namaPemilik: initialData?.namaPemilik || '',
     deskripsi: initialData?.deskripsi || '',
     sektor: initialData?.sektor || '',
-    status: initialData?.status || 'Aktif',
-    latitude: initialData?.latitude || '',
-    longitude: initialData?.longitude || '',
+    status: initialData?.status || 'PMDN',
     desa: initialData?.desa || '',
     kecamatan: initialData?.kecamatan || '',
     nomerTelp: initialData?.nomerTelp || '',
     email: initialData?.email || '',
-    gambar: initialData?.gambar || '',
     investasi: initialData?.investasi || '',
-    tahunBerdiri: initialData?.tahunBerdiri || new Date().getFullYear(),
+    tahunBerdiri: initialData?.tahunBerdiri || '',
   })
 
-  const [coordinates, setCoordinates] = useState(
-    initialData?.latitude && initialData?.longitude 
-      ? `${initialData.latitude}, ${initialData.longitude}` 
-      : ''
-  )
+  useEffect(() => {
+    const loadWilayahs = async () => {
+      try {
+        const res = await fetch('/api/wilayah')
+        const data = await res.json()
+        setWilayahs(Array.isArray(data) ? data : [])
+      } catch (e) {
+        console.error('Gagal load wilayah:', e)
+      } finally {
+        setLoadingWilayah(false)
+      }
+    }
 
-  const sectors = ['Pariwisata', 'Pertanian', 'Kerajinan', 'Perikanan', 'Perdagangan', 'Manufaktur', 'Teknologi', 'Jasa']
-  const statusOptions = ['Aktif', 'Non-Aktif', 'Dalam Pengembangan']
+    loadWilayahs()
+  }, [])
+
+  const districtOptions = useMemo(() => {
+    return [...new Set(wilayahs.map((w) => w.kecamatan))].sort((a, b) => a.localeCompare(b))
+  }, [wilayahs])
+
+  const villageOptions = useMemo(() => {
+    const filtered = wilayahs.filter((w) => w.kecamatan === formData.kecamatan)
+    return [...new Set(filtered.map((w) => w.desa))].sort((a, b) => a.localeCompare(b))
+  }, [wilayahs, formData.kecamatan])
+
+  const sectors = [
+    'Kementerian Pariwisata',
+    'Kementerian Perdagangan',
+    'Kementerian Perindustrian',
+    'Kementerian Pekerjaan Umum',
+    'Kementerian Kesehatan',
+    'Kementerian Kelautan dan Perikanan',
+    'Lainnya',
+  ]
+  const statusOptions = ['PMDN', 'PMA', 'Lainnya']
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'investasi' || name === 'tahunBerdiri' 
-        ? (value === '' ? '' : Number(value)) 
-        : value,
-    }))
-  }
 
-  const parseCoordinates = (input: string) => {
-    setCoordinateError(null)
-    const cleaned = input.trim()
-    if (!cleaned) {
-      setFormData(prev => ({ ...prev, latitude: '', longitude: '' }))
+    if (name === 'kecamatan') {
+      setFormData((prev) => ({ ...prev, kecamatan: value, desa: '' }))
       return
     }
-    let match = cleaned.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/)
-    if (!match) match = cleaned.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
-    if (!match) match = cleaned.match(/^(-?\d+\.?\d*)\s+(-?\d+\.?\d*)$/)
 
-    if (match) {
-      const lat = parseFloat(match[1])
-      const lng = parseFloat(match[2])
-      if (lat >= -11 && lat <= 6 && lng >= 95 && lng <= 141) {
-        setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }))
-        setCoordinateError(null)
-      } else {
-        setCoordinateError('Koordinat di luar jangkauan Indonesia')
-      }
-    } else {
-      setCoordinateError('Format tidak valid. Contoh: -8.7833, 116.2333')
-    }
-  }
-
-  const handleCoordinateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setCoordinates(value)
-    parseCoordinates(value)
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'investasi' || name === 'tahunBerdiri' ? (value === '' ? '' : Number(value)) : value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    
-    if (!formData.latitude || !formData.longitude) {
-      toast.error("Koordinat Wajib Diisi", {
-        description: "Pastikan Anda memasukkan titik lokasi yang valid."
-      })
-      setLoading(false)
-      return
-    }
 
-    // Gunakan toast.promise untuk UX yang lebih interaktif
     const promise = async () => {
       const dataToSubmit = {
         ...formData,
-        latitude: Number(formData.latitude),
-        longitude: Number(formData.longitude),
         investasi: formData.investasi ? String(formData.investasi) : null,
         tahunBerdiri: formData.tahunBerdiri ? Number(formData.tahunBerdiri) : null,
       }
-      
+
       const url = initialData?.id ? `/api/usaha/${initialData.id}` : '/api/usaha'
       const method = initialData?.id ? 'PUT' : 'POST'
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSubmit),
       })
-      
+
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Terjadi kesalahan')
-      
       return result
     }
 
     toast.promise(promise(), {
       loading: 'Menghubungkan ke server...',
-      success: (data) => {
+      success: () => {
         if (onSuccess) onSuccess()
-        return initialData?.id 
-          ? `Data ${formData.nama} Berhasil Diperbarui` 
-          : `Data ${formData.nama} Berhasil Disimpan`;
+        return initialData?.id
+          ? `Data ${formData.nama} berhasil diperbarui`
+          : `Data ${formData.nama} berhasil disimpan`
       },
       error: (err) => {
         setError(err.message)
-        return `Gagal: ${err.message}`;
+        return `Gagal: ${err.message}`
       },
       finally: () => {
         setLoading(false)
-      }
+      },
     })
   }
 
-  const inputClassName = "w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm"
+  const inputClassName =
+    'w-full px-5 py-3 border-2 border-slate-200 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 text-left font-poppins">
@@ -153,16 +156,14 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Nama Usaha */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Building2 size={12} className="text-blue-600" /> Nama Usaha *
+            <Building2 size={12} className="text-blue-600" /> Nama Proyek / Usaha *
           </label>
           <input
             type="text"
             name="nama"
-            placeholder="CONTOH: RESORT SENGGIGI"
+            placeholder="CONTOH: HOTEL PURI SENGGIGI"
             value={formData.nama}
             onChange={handleChange}
             className={inputClassName}
@@ -170,15 +171,14 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           />
         </div>
 
-        {/* Nama Pemilik */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <User size={12} className="text-blue-600" /> Nama Pemilik / Direktur *
+            <User size={12} className="text-blue-600" /> Nama Perusahaan / Pemilik *
           </label>
           <input
             type="text"
             name="namaPemilik"
-            placeholder="NAMA LENGKAP PEMILIK"
+            placeholder="NAMA PERUSAHAAN"
             value={formData.namaPemilik}
             onChange={handleChange}
             className={inputClassName}
@@ -186,10 +186,9 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           />
         </div>
 
-        {/* Sektor */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Info size={12} className="text-blue-600" /> Sektor *
+            <Info size={12} className="text-blue-600" /> Sektor Pembina *
           </label>
           <div className="relative">
             <select
@@ -199,17 +198,20 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
               className={`${inputClassName} appearance-none pr-10 font-bold`}
               required
             >
-              <option value="">Pilih Sektor</option>
-              {sectors.map((sector) => <option key={sector} value={sector}>{sector}</option>)}
+              <option value="">Pilih sektor</option>
+              {sectors.map((sector) => (
+                <option key={sector} value={sector}>
+                  {sector}
+                </option>
+              ))}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
-        {/* Status */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <ShieldCheck size={12} className="text-blue-600" /> Status
+            <ShieldCheck size={12} className="text-blue-600" /> Status Penanaman Modal
           </label>
           <div className="relative">
             <select
@@ -218,16 +220,109 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
               onChange={handleChange}
               className={`${inputClassName} appearance-none pr-10 font-bold`}
             >
-              {statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
-        {/* Tahun Berdiri */}
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Calendar size={12} className="text-blue-600" /> Tahun Berdiri
+            <MapPin size={12} className="text-blue-600" /> Kecamatan *
+          </label>
+          <div className="relative">
+            <select
+              name="kecamatan"
+              value={formData.kecamatan}
+              onChange={handleChange}
+              className={`${inputClassName} appearance-none pr-10 font-bold`}
+              required
+              disabled={loadingWilayah}
+            >
+              <option value="">Pilih kecamatan</option>
+              {districtOptions.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <MapPin size={12} className="text-blue-600" /> Desa / Kelurahan *
+          </label>
+          <div className="relative">
+            <select
+              name="desa"
+              value={formData.desa}
+              onChange={handleChange}
+              className={`${inputClassName} appearance-none pr-10 font-bold`}
+              required
+              disabled={!formData.kecamatan || loadingWilayah}
+            >
+              <option value="">Pilih desa</option>
+              {villageOptions.map((village) => (
+                <option key={village} value={village}>
+                  {village}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Mail size={12} className="text-blue-600" /> Email
+          </label>
+          <input
+            type="email"
+            name="email"
+            placeholder="email@perusahaan.com"
+            value={formData.email}
+            onChange={handleChange}
+            className={inputClassName}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Phone size={12} className="text-blue-600" /> Nomor Telepon
+          </label>
+          <input
+            type="tel"
+            name="nomerTelp"
+            placeholder="08xxxxxxxxxx"
+            value={formData.nomerTelp}
+            onChange={handleChange}
+            className={inputClassName}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Wallet size={12} className="text-blue-600" /> Jumlah Investasi (Rp)
+          </label>
+          <input
+            type="number"
+            name="investasi"
+            placeholder="0"
+            value={formData.investasi}
+            onChange={handleChange}
+            className={inputClassName}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Calendar size={12} className="text-blue-600" /> Tahun Terbit OSS / Berdiri
           </label>
           <input
             type="number"
@@ -240,132 +335,16 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
           />
         </div>
 
-        {/* Kecamatan */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <MapPin size={12} className="text-blue-600" /> Kecamatan *
-          </label>
-          <input
-            type="text"
-            name="kecamatan"
-            placeholder="MASUKKAN KECAMATAN"
-            value={formData.kecamatan}
-            onChange={handleChange}
-            className={inputClassName}
-            required
-          />
-        </div>
-
-        {/* Desa */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <MapPin size={12} className="text-blue-600" /> Desa *
-          </label>
-          <input
-            type="text"
-            name="desa"
-            placeholder="MASUKKAN DESA"
-            value={formData.desa}
-            onChange={handleChange}
-            className={inputClassName}
-            required
-          />
-        </div>
-
-        {/* Email */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Mail size={12} className="text-blue-600" /> Email *
-          </label>
-          <input
-            type="email"
-            name="email"
-            placeholder="admin@bisnis.com"
-            value={formData.email}
-            onChange={handleChange}
-            className={inputClassName}
-            required
-          />
-        </div>
-
-        {/* Nomor Telepon */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Phone size={12} className="text-blue-600" /> Nomor Telepon *
-          </label>
-          <input
-            type="tel"
-            name="nomerTelp"
-            placeholder="081XXXXXXX"
-            value={formData.nomerTelp}
-            onChange={handleChange}
-            className={inputClassName}
-            required
-          />
-        </div>
-
-        {/* Investasi */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Wallet size={12} className="text-blue-600" /> Investasi (Rupiah)
-          </label>
-          <input
-            type="number"
-            name="investasi"
-            placeholder="JUMLAH DALAM RUPIAH"
-            value={formData.investasi}
-            onChange={handleChange}
-            className={inputClassName}
-          />
-        </div>
-
-        {/* Koordinat */}
-        <div className="md:col-span-2 lg:col-span-2 space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <Globe size={12} className="text-blue-600" /> Koordinat (Google Maps) *
-          </label>
-          <input
-            type="text"
-            value={coordinates}
-            onChange={handleCoordinateChange}
-            className={`w-full px-5 py-3 border-2 rounded-2xl bg-slate-50 text-slate-900 font-bold text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm ${
-              coordinateError ? 'border-red-500' : 'border-slate-200'
-            }`}
-            placeholder="Contoh: -8.123, 116.123"
-            required
-          />
-          {coordinateError && <p className="text-[10px] font-bold text-red-500 uppercase ml-2">{coordinateError}</p>}
-          {formData.latitude && !coordinateError && (
-            <p className="text-[10px] font-bold text-green-600 uppercase ml-2 italic">✓ Terbaca: {formData.latitude}, {formData.longitude}</p>
-          )}
-        </div>
-
-        {/* URL Gambar */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <ImageIcon size={12} className="text-blue-600" /> URL Gambar Usaha
-          </label>
-          <input
-            type="url"
-            name="gambar"
-            placeholder="https://..."
-            value={formData.gambar}
-            onChange={handleChange}
-            className={inputClassName}
-          />
-        </div>
-
-        {/* Deskripsi */}
         <div className="lg:col-span-3 space-y-2">
           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <FileText size={12} className="text-blue-600" /> Deskripsi Usaha
+            <FileText size={12} className="text-blue-600" /> Ringkasan Data Proyek (Alamat, KBLI, Risiko, dll)
           </label>
           <textarea
             name="deskripsi"
             value={formData.deskripsi}
             onChange={handleChange}
-            rows={3}
-            placeholder="Ceritakan singkat tentang unit usaha ini..."
+            rows={4}
+            placeholder="Masukkan ringkasan data proyek yang relevan"
             className={`${inputClassName} resize-none font-bold`}
           />
         </div>
@@ -374,13 +353,17 @@ export default function BusinessForm({ initialData, onSuccess }: BusinessFormPro
       <div className="flex justify-end pt-4 border-t border-slate-50">
         <Button
           type="submit"
-          disabled={loading || !!coordinateError}
+          disabled={loading || loadingWilayah}
           className="w-full md:w-80 h-14 bg-blue-600 hover:bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-200 transition-all flex gap-3 active:scale-95"
         >
           {loading ? (
-            <><Loader2 className="animate-spin" size={18} /> Memproses...</>
+            <>
+              <Loader2 className="animate-spin" size={18} /> Memproses...
+            </>
           ) : (
-            <>{initialData?.id ? 'Perbarui Data' : 'Simpan Database'} <Save size={18} /></>
+            <>
+              {initialData?.id ? 'Perbarui Data' : 'Simpan Data'} <Save size={18} />
+            </>
           )}
         </Button>
       </div>

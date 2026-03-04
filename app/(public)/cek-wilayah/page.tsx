@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { LeafletMapUpdated } from "@/components/leaflet-map-updated"
@@ -29,6 +29,7 @@ export default function CekWilayahPage() {
   const [selectedDistrict, setSelectedDistrict] = useState<string>("")
   const [selectedVillage, setSelectedVillage] = useState<string>("")
   const [showDetails, setShowDetails] = useState(false)
+  const mapSectionRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const fetchWilayah = async () => {
@@ -50,6 +51,13 @@ export default function CekWilayahPage() {
   const districts = useMemo(() => {
     const unique = Array.from(new Set(wilayahData.map(w => w.kecamatan)))
     return unique.sort()
+  }, [wilayahData])
+
+  const rdtrPriorityDistricts = useMemo(() => {
+    const ready = wilayahData
+      .filter((w) => (w.statusRdtr || '').toLowerCase() === 'tersedia')
+      .map((w) => w.kecamatan)
+    return Array.from(new Set(ready)).sort()
   }, [wilayahData])
 
   const villages = useMemo(() => {
@@ -78,6 +86,14 @@ export default function CekWilayahPage() {
     setShowDetails(true)
   }, [])
 
+  const scrollToMapSection = useCallback(() => {
+    if (!mapSectionRef.current) return
+    const headerOffset = 24
+    const elementTop = mapSectionRef.current.getBoundingClientRect().top + window.scrollY
+    const targetTop = Math.max(0, elementTop - headerOffset)
+    window.scrollTo({ top: targetTop, behavior: "smooth" })
+  }, [])
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
@@ -89,7 +105,7 @@ export default function CekWilayahPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 font-poppins text-slate-900 pb-24 text-left">
-      <div className="border-b border-slate-200 bg-white sticky top-0 z-[100] shadow-sm">
+      <div className="hidden">
         <div className="max-w-6xl mx-auto px-4 py-6 md:py-8 flex items-center gap-5">
           <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shrink-0">
             <Search className="w-6 h-6 text-white" />
@@ -122,7 +138,17 @@ export default function CekWilayahPage() {
                       <SelectContent className="z-[10001]">{villages.map(v => <SelectItem key={v} value={v} className="font-medium py-3 text-base">{v}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
-                  <button onClick={() => selectedVillage && setShowDetails(true)} disabled={!selectedVillage} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white rounded-xl h-16 font-black shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest text-sm mt-4 flex items-center justify-center gap-2">Mulai Analisis <ChevronRight className="w-5 h-5" /></button>
+                  <button
+                    onClick={() => {
+                      if (!selectedVillage) return
+                      setShowDetails(true)
+                      scrollToMapSection()
+                    }}
+                    disabled={!selectedVillage}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white rounded-xl h-16 font-black shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest text-sm mt-4 flex items-center justify-center gap-2"
+                  >
+                    Mulai Analisis <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               </Card>
               <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex gap-4 shadow-sm"><Info className="w-6 h-6 text-blue-600 shrink-0 mt-1" /><p className="text-sm text-blue-800 leading-relaxed font-semibold"><strong>Tips:</strong> Klik langsung area pada peta untuk mendeteksi potensi secara instan.</p></div>
@@ -130,9 +156,9 @@ export default function CekWilayahPage() {
           </div>
 
           <div className="lg:col-span-8 space-y-10">
-            <Card className="rounded-2xl border-none shadow-2xl overflow-hidden bg-white relative z-0">
+            <Card ref={mapSectionRef} className="rounded-2xl border-none shadow-2xl overflow-hidden bg-white relative z-0">
               <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-white"><h3 className="font-black text-slate-900 uppercase tracking-tighter text-xl">Peta Lokasi Indikatif</h3><span className="flex items-center gap-2 text-xs font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-full uppercase"><div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div> Live Database</span></div>
-              <div className="p-4 px-7 bg-white"><div className="h-[500px] relative z-0 rounded-xl overflow-hidden border border-slate-100"><LeafletMapUpdated onSelectRegion={handleMapSelect} selectedDistrict={selectedDistrict} selectedVillage={selectedVillage} /></div></div>
+              <div className="p-4 px-7 bg-white"><div className="h-[500px] relative z-0 rounded-xl overflow-hidden border border-slate-100"><LeafletMapUpdated onSelectRegion={handleMapSelect} selectedDistrict={selectedDistrict} selectedVillage={selectedVillage} preferredDistricts={rdtrPriorityDistricts} /></div></div>
             </Card>
 
             {showDetails && selectedData ? (

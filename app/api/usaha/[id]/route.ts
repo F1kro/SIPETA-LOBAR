@@ -1,6 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
+import {
+  asSafeString,
+  parseRupiahToBigInt,
+  parseYearFromDateText,
+  resolveWilayahCoordinate,
+  toNullableString,
+} from '@/lib/usaha-utils'
 
 // GET single usaha
 export async function GET(
@@ -55,23 +62,36 @@ export async function PUT(
       return NextResponse.json({ error: 'Usaha not found' }, { status: 404 })
     }
 
+    const kecamatan = asSafeString(body.kecamatan)
+    const desa = asSafeString(body.desa)
+    const regionPoint = await resolveWilayahCoordinate(kecamatan, desa)
+    if (!regionPoint) {
+      return NextResponse.json(
+        { error: `Wilayah tidak ditemukan untuk ${desa}, ${kecamatan}` },
+        { status: 400 },
+      )
+    }
+
     const usaha = await prisma.usaha.update({
       where: { id },
       data: {
-        nama: body.nama,
-        namaPemilik: body.namaPemilik, // --- UPDATE NAMA PEMILIK ---
-        sektor: body.sektor,
-        status: body.status,
-        latitude: parseFloat(body.latitude),
-        longitude: parseFloat(body.longitude),
-        kecamatan: body.kecamatan,
-        desa: body.desa,
-        nomerTelp: body.nomerTelp,
-        email: body.email,
-        deskripsi: body.deskripsi || null,
-        gambar: body.gambar || null,
-        investasi: body.investasi ? BigInt(body.investasi) : null,
-        tahunBerdiri: body.tahunBerdiri ? parseInt(body.tahunBerdiri) : null,
+        nama: asSafeString(body.nama),
+        namaPemilik: asSafeString(body.namaPemilik),
+        sektor: asSafeString(body.sektor),
+        status: asSafeString(body.status) || 'Aktif',
+        latitude: regionPoint.latitude,
+        longitude: regionPoint.longitude,
+        kecamatan,
+        desa,
+        nomerTelp: asSafeString(body.nomerTelp) || '-',
+        email: asSafeString(body.email) || '-',
+        deskripsi: toNullableString(body.deskripsi),
+        gambar: toNullableString(body.gambar),
+        investasi: parseRupiahToBigInt(body.investasi),
+        tahunBerdiri:
+          typeof body.tahunBerdiri === 'number'
+            ? body.tahunBerdiri
+            : parseYearFromDateText(body.tahunBerdiri),
       },
     })
 

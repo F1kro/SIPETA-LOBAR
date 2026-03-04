@@ -107,7 +107,7 @@ export default function HasilRekomendasiPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b border-border bg-white sticky top-0 z-10">
+      <div className="hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
+import { resolveMasterCoordinate } from '@/lib/wilayah-master'
 
 export async function GET() {
   try {
@@ -24,12 +25,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Data tidak lengkap' }, { status: 400 })
     }
 
+    const kecamatan = String(body.kecamatan || '').trim()
+    const desa = String(body.desa || '').trim()
+    const masterPoint = resolveMasterCoordinate(kecamatan, desa)
+    if (!masterPoint) {
+      return NextResponse.json({ error: `Wilayah ${desa}, ${kecamatan} tidak ada pada referensi geolokasi` }, { status: 400 })
+    }
+
     const wilayah = await prisma.wilayah.create({
       data: {
-        kecamatan: body.kecamatan,
-        desa: body.desa,
-        latitude: parseFloat(body.latitude) || 0,
-        longitude: parseFloat(body.longitude) || 0,
+        kecamatan,
+        desa,
+        latitude: masterPoint.latitude,
+        longitude: masterPoint.longitude,
         statusRdtr: body.statusRdtr,
         usahaSesuai: body.usahaSesuai, // String JSON dari client
         perluKajian: body.perluKajian, // String JSON dari client
