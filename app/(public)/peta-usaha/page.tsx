@@ -36,7 +36,11 @@ interface WilayahItem {
 export default function PetaUsahaPage() {
   const router = useRouter()
   const [loadingMeta, setLoadingMeta] = useState(true)
+  const [metaError, setMetaError] = useState<string | null>(null)
   const [searching, setSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const [mapLoading, setMapLoading] = useState(true)
+  const [mapError, setMapError] = useState<string | null>(null)
   const [usahas, setUsahas] = useState<any[]>([])
   const [wilayahs, setWilayahs] = useState<WilayahItem[]>([])
   const [sectors, setSectors] = useState<string[]>([])
@@ -54,13 +58,18 @@ export default function PetaUsahaPage() {
   useEffect(() => {
     const loadMeta = async () => {
       try {
+        setMetaError(null)
         const [wilayahRes, metaRes] = await Promise.all([fetch('/api/wilayah'), fetch('/api/usaha/meta')])
+        if (!wilayahRes.ok || !metaRes.ok) {
+          throw new Error('Gagal memuat metadata filter.')
+        }
         const wilayahData = await wilayahRes.json()
         const metaData = await metaRes.json()
         setWilayahs(Array.isArray(wilayahData) ? wilayahData : [])
         setSectors(Array.isArray(metaData?.sectors) ? metaData.sectors : [])
       } catch (e) {
         console.error('Failed loading meta:', e)
+        setMetaError('Metadata filter gagal dimuat. Silakan refresh halaman.')
       } finally {
         setLoadingMeta(false)
       }
@@ -93,12 +102,17 @@ export default function PetaUsahaPage() {
     if (desa !== 'Semua') params.set('desa', desa)
 
     const res = await fetch(`/api/usaha?${params.toString()}`)
+    if (!res.ok) {
+      throw new Error('Gagal memuat daftar usaha.')
+    }
     const data = await res.json()
     setUsahas(Array.isArray(data) ? data : [])
   }
 
   const handleSearch = async () => {
+    if (loadingMeta || mapLoading || !!mapError) return
     setSearching(true)
+    setSearchError(null)
     try {
       setFilterSektor(tempSektor)
       setFilterKecamatan(tempKecamatan)
@@ -118,6 +132,7 @@ export default function PetaUsahaPage() {
     } catch (error) {
       console.error('Search error:', error)
       setUsahas([])
+      setSearchError('Data usaha gagal dimuat. Coba lagi beberapa saat.')
     } finally {
       setSearching(false)
     }
@@ -141,6 +156,7 @@ export default function PetaUsahaPage() {
   }
 
   const handleSelectRegionFromMap = async (regionKey: string) => {
+    if (mapLoading || !!mapError || loadingMeta) return
     const parsed = parseRegionKey(regionKey)
     setSelectedRegionKey(regionKey)
     setTempKecamatan(parsed.kecamatan)
@@ -149,12 +165,19 @@ export default function PetaUsahaPage() {
     setFilterDesa(parsed.desa)
 
     setSearching(true)
+    setSearchError(null)
     try {
       await fetchUsahaFiltered(parsed.kecamatan, parsed.desa, tempSektor)
+    } catch (error) {
+      console.error('Region search error:', error)
+      setUsahas([])
+      setSearchError('Daftar usaha gagal dimuat untuk wilayah ini.')
     } finally {
       setSearching(false)
     }
   }
+
+  const controlsDisabled = loadingMeta || searching || mapLoading || !!mapError || !!metaError
 
   return (
     <main className="min-h-screen bg-gray-50 font-poppins text-gray-800">
@@ -167,6 +190,8 @@ export default function PetaUsahaPage() {
               activeDistrict={filterKecamatan}
               activeVillage={filterDesa}
               onSelectRegion={handleSelectRegionFromMap}
+              onLoadingChange={setMapLoading}
+              onErrorChange={setMapError}
             />
 
             {hasLocationFilter && (
@@ -194,6 +219,7 @@ export default function PetaUsahaPage() {
                         <button
                           key={u.id}
                           onClick={() => router.push(`/peta-usaha/${u.id}`)}
+                          disabled={searching || mapLoading}
                           className="w-full text-left p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50 transition-colors"
                         >
                           <div className="text-[10px] font-black uppercase tracking-wider text-blue-600 mb-1">{u.sektor}</div>
@@ -217,9 +243,10 @@ export default function PetaUsahaPage() {
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Sektor</p>
                 <select
-                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none"
+                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none disabled:opacity-60 disabled:cursor-not-allowed"
                   value={tempSektor}
                   onChange={(e) => setTempSektor(e.target.value)}
+                  disabled={controlsDisabled}
                 >
                   {daftarSektor.map((s) => (
                     <option key={s} value={s}>{s === 'Semua' ? 'Semua Sektor' : s}</option>
@@ -235,9 +262,10 @@ export default function PetaUsahaPage() {
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Kecamatan</p>
                 <select
-                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none"
+                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none disabled:opacity-60 disabled:cursor-not-allowed"
                   value={tempKecamatan}
                   onChange={handleKecamatanChange}
+                  disabled={controlsDisabled}
                 >
                   {daftarKecamatan.map((k) => (
                     <option key={k} value={k}>{k}</option>
@@ -253,9 +281,10 @@ export default function PetaUsahaPage() {
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Desa / Kelurahan</p>
                 <select
-                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none"
+                  className="w-full outline-none text-sm font-bold text-gray-800 cursor-pointer bg-gray-50 px-3 py-2 rounded-lg border border-transparent focus:border-blue-200 focus:bg-white appearance-none disabled:opacity-60 disabled:cursor-not-allowed"
                   value={tempDesa}
                   onChange={(e) => setTempDesa(e.target.value)}
+                  disabled={controlsDisabled}
                 >
                   {daftarDesa.map((d) => (
                     <option key={d} value={d}>{d}</option>
@@ -267,16 +296,17 @@ export default function PetaUsahaPage() {
             <div className="flex gap-2 w-full">
               <button
                 onClick={handleReset}
+                disabled={controlsDisabled}
                 className="bg-gray-200 text-gray-700 px-4 py-3.5 rounded-xl font-bold text-sm uppercase tracking-widest flex-1 hover:bg-gray-300"
               >
                 Reset
               </button>
               <button
                 onClick={handleSearch}
-                disabled={searching || loadingMeta}
-                className={`bg-blue-600 text-white px-6 py-3.5 rounded-xl font-black text-sm uppercase tracking-widest flex-1 shadow-md hover:bg-blue-700 ${(searching || loadingMeta) ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={controlsDisabled}
+                className={`bg-blue-600 text-white px-6 py-3.5 rounded-xl font-black text-sm uppercase tracking-widest flex-1 shadow-md hover:bg-blue-700 ${controlsDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                {searching ? 'Memuat...' : 'Cari'}
+                {loadingMeta || mapLoading ? 'Menyiapkan...' : searching ? 'Memuat...' : 'Cari'}
               </button>
             </div>
           </div>
@@ -286,7 +316,14 @@ export default function PetaUsahaPage() {
             <span className="font-bold ml-1">{filterKecamatan === 'Semua' ? 'Semua Kecamatan' : filterKecamatan}</span> -
             <span className="font-bold ml-1">{filterDesa === 'Semua' ? 'Semua Desa/Kelurahan' : filterDesa}</span>
             {loadingMeta && <span className="ml-2 text-blue-600">Memuat metadata...</span>}
+            {mapLoading && <span className="ml-2 text-blue-600">Menyiapkan peta...</span>}
           </div>
+
+          {(metaError || mapError || searchError) && (
+            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs md:text-sm font-bold text-red-700">
+              {metaError || mapError || searchError}
+            </div>
+          )}
         </div>
       </section>
 
